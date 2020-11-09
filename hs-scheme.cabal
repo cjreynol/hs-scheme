@@ -1,28 +1,28 @@
-cabal-version:          2.4
+cabal-version:          3.0
 name:                   hs-scheme
 version:                0.1.0.0
 license:                MIT
 license-file:           LICENSE
-copyright:              (c) 2019 Chad Reynolds
+copyright:              (c) 2020 Chad Reynolds
 author:                 Chad Reynolds
 maintainer:             cjreynol13@aol.com
 stability:              alpha
--- homepage:
--- bug-reports:
+homepage:               https://github.com/cjreynol/hs-scheme
+bug-reports:            https://github.com/cjreynol/hs-scheme/issues
 synopsis:               Implementation of "Write Yourself a Scheme in 48 Hours"
 -- description:
 category:               Language
-tested-with:            GHC == 8.6.3
+tested-with:            GHC == 8.10.2
 -- data-files:
 extra-source-files:     README.md
 
--- source-repository head
---  type:               git
---  location:           
+source-repository head
+    type:               git
+    location:           git://github.com/cjreynol/hs-scheme.git
 
 executable hs-scheme
     main-is:            Main.hs
-    build-depends:        base          ^>= 4.12.0.0
+    build-depends:        base          ^>= 4.14.0.0
                         , hs-scheme-lib
     -- other-modules:
     hs-source-dirs:     hs-scheme
@@ -35,8 +35,8 @@ executable hs-scheme
                         -Wmissing-import-lists
 
 library hs-scheme-lib
-    build-depends:        base      ^>= 4.12.0.0
-                        , parsec    >=  3.1.13
+    build-depends:        base      ^>= 4.14.0.0
+                        , parsec    >=  3.1.14
     exposed-modules:      LispVal
                         , Parser
     -- other-modules:    
@@ -52,8 +52,8 @@ library hs-scheme-lib
 test-suite spec
     type:               exitcode-stdio-1.0
     main-is:            Spec.hs
-    build-depends:        base          ^>= 4.12.0.0
-                        , hspec         >=  2.7.1
+    build-depends:        base          ^>= 4.14.0.0
+                        , hspec         >=  2.7.4
                         , hs-scheme-lib
     other-modules:        ParserSpec
     hs-source-dirs:       test
