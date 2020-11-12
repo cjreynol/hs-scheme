@@ -10,7 +10,7 @@ stability:              alpha
 homepage:               https://github.com/cjreynol/hs-scheme
 bug-reports:            https://github.com/cjreynol/hs-scheme/issues
 synopsis:               Implementation of "Write Yourself a Scheme in 48 Hours"
--- description:
+description:            Based on the book here:  https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours
 category:               Language
 tested-with:            GHC == 8.10.2
 -- data-files:
@@ -36,7 +36,7 @@ executable hs-scheme
 
 library hs-scheme-lib
     build-depends:        base      ^>= 4.14.0.0
-                        , parsec    >=  3.1.14
+                        , megaparsec    >=  9.0.1
     exposed-modules:      LispVal
                         , Parser
     -- other-modules:    

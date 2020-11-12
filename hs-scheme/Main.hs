@@ -1,7 +1,7 @@
 {-|
 Module      : Main
 Description : The main program
-Copyright   : (c) Chad Reynolds, 2019
+Copyright   : (c) Chad Reynolds, 2020
 License     : MIT
 -}
 
@@ -9,7 +9,6 @@ module Main (
     main
     ) where
 
-import Control.Monad        (mapM_)
 import System.Environment   (getArgs)
 
 import Parser               (readExpr)

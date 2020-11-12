@@ -1,7 +1,7 @@
 {-|
 Module      : LispVal
 Description : The datatype for scheme language constructs
-Copyright   : (c) Chad Reynolds, 2019
+Copyright   : (c) Chad Reynolds, 2020
 License     : MIT
 -}
 
@@ -11,10 +11,10 @@ module LispVal (
 
 
 data LispVal = Atom String 
-                | List [LispVal]
+                | Bool Bool
                 | DottedList [LispVal] LispVal
+                | List [LispVal]
                 | Number Integer
                 | String String
-                | Bool Bool
     deriving (Eq, Show)
 
