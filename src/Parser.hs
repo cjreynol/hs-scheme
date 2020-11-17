@@ -1,9 +1,8 @@
 {-|
 Module      : Parser
-Description : The Scheme parser
+Description : The Scheme languge parser
 Copyright   : (c) Chad Reynolds, 2020
 License     : MIT
-
 -}
 
 module Parser (
@@ -11,14 +10,12 @@ module Parser (
     , readExpr
     ) where
 
-import Control.Monad        (liftM)
-
 import Data.Void            (Void)
 
 import Text.Megaparsec      (Parsec, ParseErrorBundle, (<|>), endBy, 
-                            many, noneOf, oneOf, parse, sepBy, 
-                            skipSome, some, try)
-import Text.Megaparsec.Char (char, digitChar, letterChar, space)
+                            many, noneOf, oneOf, runParser, sepBy1, 
+                            some, try)
+import Text.Megaparsec.Char (char, digitChar, letterChar, space1)
 
 import LispVal              (LispVal(Atom, Bool, DottedList, List, 
                             Number, String))
@@ -27,13 +24,13 @@ import LispVal              (LispVal(Atom, Bool, DottedList, List,
 type Parser = Parsec Void String
 type ParserError = ParseErrorBundle String Void
 
-parseLispVal :: String -> Either ParserError LispVal
-parseLispVal input = parse parseExpr "lisp" input
-
 readExpr :: String -> String
 readExpr input = case parseLispVal input of
-    Left err -> "No match\n" ++ show err
     Right val -> "Match\n" ++ show val
+    Left err -> "No match\n" ++ show err
+
+parseLispVal :: String -> Either ParserError LispVal
+parseLispVal input = runParser parseExpr "lisp" input
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom 
@@ -57,22 +54,22 @@ parseAtom = do
                 _ -> Atom atom
 
 parseList :: Parser LispVal
-parseList = List <$> (sepBy parseExpr spaces)
+parseList = List <$> (sepBy1 parseExpr space1)
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
-    h <- endBy parseExpr spaces
-    t <- char '.' >> spaces >> parseExpr
+    h <- endBy parseExpr space1
+    t <- char '.' >> space1 >> parseExpr
     return $ DottedList h t
 
 parseQuoted :: Parser LispVal
 parseQuoted = do
     _ <- char '\''
     x <- parseExpr
-    return $ List [Atom "quote", x]
+    return $ List [quoteAtom, x]
 
 parseNumber :: Parser LispVal
-parseNumber = liftM (Number . read) $ some digitChar
+parseNumber = (Number . read) <$> some digitChar
 
 parseString :: Parser LispVal
 parseString = do
@@ -87,6 +84,6 @@ symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
 escapeChar :: Parser Char
 escapeChar = oneOf "\"nrt\\"
 
-spaces :: Parser ()
-spaces = skipSome space
+quoteAtom :: LispVal
+quoteAtom = Atom "quote"
 
