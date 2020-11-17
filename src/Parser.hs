@@ -21,6 +21,13 @@ import LispVal              (LispVal(Atom, Bool, DottedList, List,
                             Number, String))
 
 
+-- TODO CJR:  finish string escaped chars parsing and testing
+-- TODO CJR:  parse prefixed numbers in bin, oct, dec, hex
+-- TODO CJR:  parse scheme #\-style characters
+-- TODO CJR:  parse floats
+-- TODO CJR:  left-factor grammar to remove any "try" usage
+-- TODO CJR:  parse backquotes
+-- TODO CJR:  parse (and add value support) for vectors
 type Parser = Parsec Void String
 type ParserError = ParseErrorBundle String Void
 
