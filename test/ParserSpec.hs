@@ -16,8 +16,6 @@ import LispVal      (LispVal(..))
 import Parser       (parseLispVal)
 
 
--- TODO CJR:  Figure out how to split these up more, based on 
---  LispVal type probably
 spec :: Spec
 spec = do
     describe "Parsing tests" $ do 

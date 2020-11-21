@@ -17,5 +17,4 @@ data LispVal = Atom String
                 | Number Integer
                 | String String
     deriving (Eq, Show)
--- TODO CJR:  Create custom show instance
 

@@ -15,19 +15,15 @@ import Data.Void            (Void)
 import Text.Megaparsec      (Parsec, ParseErrorBundle, (<|>), endBy, 
                             many, noneOf, oneOf, runParser, sepBy1, 
                             some, try)
-import Text.Megaparsec.Char (char, digitChar, letterChar, space1)
+import Text.Megaparsec.Char (char, digitChar, letterChar, space1,
+                            binDigitChar, octDigitChar, hexDigitChar,
+                            alphaNumChar)
 
+import Extra                (toBase)
 import LispVal              (LispVal(Atom, Bool, DottedList, List, 
                             Number, String))
 
 
--- TODO CJR:  escaped string chars
--- TODO CJR:  parse prefixed numbers in bin, oct, dec, hex
--- TODO CJR:  parse scheme #\-style characters
--- TODO CJR:  parse floats
--- TODO CJR:  left-factor grammar to remove any "try" usage
--- TODO CJR:  parse backquotes
--- TODO CJR:  parse (and add value support) for vectors
 type Parser = Parsec Void String
 type ParserError = ParseErrorBundle String Void
 
@@ -40,9 +36,10 @@ parseLispVal :: String -> Either ParserError LispVal
 parseLispVal input = runParser parseExpr "lisp" input
 
 parseExpr :: Parser LispVal
-parseExpr = parseAtom 
+parseExpr = parsePound
+    <|> parseAtom 
     <|> parseString
-    <|> parseNumber
+    <|> parseDec
     <|> parseQuoted
     <|> do 
         _ <- char '('
@@ -53,12 +50,9 @@ parseExpr = parseAtom
 parseAtom :: Parser LispVal
 parseAtom = do
     first <- letterChar <|> symbol
-    rest <- many (letterChar <|> digitChar <|> symbol)
+    rest <- many (alphaNumChar <|> symbol)
     let atom = first : rest
-    return $ case atom of
-                "#t" -> Bool True
-                "#f" -> Bool False
-                _ -> Atom atom
+    return $ Atom atom
     where
         symbol :: Parser Char
         symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -81,9 +75,6 @@ parseQuoted = do
         quoteAtom :: LispVal
         quoteAtom = Atom "quote"
 
-parseNumber :: Parser LispVal
-parseNumber = (Number . read) <$> some digitChar
-
 parseString :: Parser LispVal
 parseString = do
     _ <- char '"'
@@ -94,4 +85,36 @@ parseString = do
         escapeChar :: Parser Char
         escapeChar = oneOf "\"nrt\\"
 
+parseDec :: Parser LispVal
+parseDec = do
+    dNumStr <- some digitChar
+    return $ Number (toBase 10 dNumStr)
+
+parsePound :: Parser LispVal
+parsePound = do
+    _ <- char '#'
+    parseBool <|> parseBin <|> parseOct <|> parsePreDec <|> parseHex
+    where
+        parseBool = parseTrue <|> parseFalse
+        parseTrue = do
+            _ <- char 't'
+            return $ Bool True
+        parseFalse = do
+            _ <- char 'f'
+            return $ Bool False
+        parseBin = do
+            _ <- char 'b'
+            bNumStr <- some binDigitChar
+            return $ Number (toBase 2 bNumStr)
+        parsePreDec = do
+            _ <- char 'd'
+            parseDec
+        parseOct = do
+            _ <- char 'o'
+            oNumStr <- some octDigitChar
+            return $ Number (toBase 8 oNumStr)
+        parseHex = do
+            _ <- char 'x'
+            hNumStr <- some hexDigitChar
+            return $ Number (toBase 16 hNumStr)
 
