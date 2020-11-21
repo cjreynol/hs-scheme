@@ -21,7 +21,7 @@ import LispVal              (LispVal(Atom, Bool, DottedList, List,
                             Number, String))
 
 
--- TODO CJR:  finish string escaped chars parsing and testing
+-- TODO CJR:  escaped string chars
 -- TODO CJR:  parse prefixed numbers in bin, oct, dec, hex
 -- TODO CJR:  parse scheme #\-style characters
 -- TODO CJR:  parse floats
@@ -59,6 +59,9 @@ parseAtom = do
                 "#t" -> Bool True
                 "#f" -> Bool False
                 _ -> Atom atom
+    where
+        symbol :: Parser Char
+        symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
 
 parseList :: Parser LispVal
 parseList = List <$> (sepBy1 parseExpr space1)
@@ -74,6 +77,9 @@ parseQuoted = do
     _ <- char '\''
     x <- parseExpr
     return $ List [quoteAtom, x]
+    where
+        quoteAtom :: LispVal
+        quoteAtom = Atom "quote"
 
 parseNumber :: Parser LispVal
 parseNumber = (Number . read) <$> some digitChar
@@ -84,13 +90,8 @@ parseString = do
     x <- many $ (noneOf "\"") <|> (char '\\' >> escapeChar)
     _ <- char '"'
     return $ String x
-                
-symbol :: Parser Char
-symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
+    where
+        escapeChar :: Parser Char
+        escapeChar = oneOf "\"nrt\\"
 
-escapeChar :: Parser Char
-escapeChar = oneOf "\"nrt\\"
-
-quoteAtom :: LispVal
-quoteAtom = Atom "quote"
 

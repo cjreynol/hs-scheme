@@ -21,90 +21,87 @@ import Parser       (parseLispVal)
 spec :: Spec
 spec = do
     describe "Parsing tests" $ do 
+        describe "Atom parsing" $ do
+            it "Simple example" $ do 
+                parseLispVal "test" 
+                    `shouldBe` Right (Atom "test")
 
-        it "Atom parsing" $ do 
-            parseLispVal "test" 
-                `shouldBe` Right (Atom "test")
+            it "Boolean true" $ do
+                parseLispVal "#t"
+                    `shouldBe` Right (Bool True)
 
-        it "Boolean true" $ do
-            parseLispVal "#t"
-                `shouldBe` Right (Bool True)
+            it "Boolean false" $ do
+                parseLispVal "#f"
+                    `shouldBe` Right (Bool False)
 
-        it "Boolean false" $ do
-            parseLispVal "#f"
-                `shouldBe` Right (Bool False)
+            it "Quoted atom" $ do
+                parseLispVal "'hello"
+                    `shouldBe` Right (List [Atom "quote", Atom "hello"])
 
-        it "String parsing" $ do
-            parseLispVal "\"hello world\""
-                `shouldBe` Right (String "hello world")
+        describe "String parsing" $ do
+            it "Simple example" $ do
+                parseLispVal "\"hello world\""
+                    `shouldBe` Right (String "hello world")
 
-        it "String end quote missing failure" $ do
-            parseLispVal "\"hello world"
-                `shouldSatisfy` isLeft
+            it "End quote missing failure" $ do
+                parseLispVal "\"hello world"
+                    `shouldSatisfy` isLeft
 
-        -- TODO CJR:  not sure if these three tests are correct
-        --              and if the parser is behaving correctly
-{-
-        it "String start quote missing failure" $ do
-            parseLispVal "hello world\""
-                `shouldSatisfy` isLeft
+            it "Start quote missing failure" $ do
+                parseLispVal "world\" test"
+                    `shouldSatisfy` isLeft
 
-        it "String escaped quote" $ do
-            parseLispVal "\"\\\"hello\\\" world\""
-                `shouldBe` Right (String "\\\"hello\"\\ world")
+            it "escaped quotes" $ do
+                parseLispVal "\"\\\"hello\\\" world\""
+                    `shouldBe` Right (String "\\\"hello\\\" world")
 
-        it "String escaped char" $ do
-            parseLispVal "\"\\nhello world\""
-                `shouldBe` Right (String "\nhello world")
--}
+            it "escaped char" $ do
+                parseLispVal "\"\\nhello world\""
+                    `shouldBe` Right (String "\\nhello world")
 
-        it "Decimal number no prefix" $ do
-            parseLispVal "10"
-                `shouldBe` Right (Number 10)
+        describe "Number parsing" $ do
+            it "Decimal number no prefix" $ do
+                parseLispVal "10"
+                    `shouldBe` Right (Number 10)
 
-        it "Quoted parsing" $ do
-            parseLispVal "'hello"
-                `shouldBe` Right (List [Atom "quote", Atom "hello"])
+            it "Hex number" $ do
+                parseLispVal "#x1A"
+                    `shouldBe` Right (Number 26)
 
-        it "List of single Atom" $ do
-            parseLispVal "(test1)"
-                `shouldBe` Right (List [Atom "test1"])
+            it "Octal number" $ do
+                parseLispVal "#o14"
+                    `shouldBe` Right (Number 12)
 
-        it "Empty List not accepted" $ do
-            parseLispVal "()"
-                `shouldSatisfy` isLeft
+            it "Binary number" $ do
+                parseLispVal "#b10"
+                    `shouldBe` Right (Number 2)
 
-        it "List of Atoms" $ do
-            parseLispVal "(test1 test2)" 
-                `shouldBe` Right (List [Atom "test1", Atom "test2"])
+            it "Decimal number prefixed" $ do
+                parseLispVal "#d10"
+                    `shouldBe` Right (Number 10)
 
-        it "List of Lists" $ do
-            parseLispVal "(test1 (test2 (test3)))"
-                `shouldBe` Right (List [Atom "test1",
-                                    List [Atom "test2",
-                                        List [Atom "test3"]]])
+        describe "List parsing" $ do
+            it "List of single Atom" $ do
+                parseLispVal "(test1)"
+                    `shouldBe` Right (List [Atom "test1"])
 
-        it "Dotted list of Atoms" $ do
-            parseLispVal "(test1 . test2)" 
-                `shouldBe` Right (DottedList [(Atom "test1")] 
-                                    (Atom "test2"))
+            it "Empty List not accepted" $ do
+                parseLispVal "()"
+                    `shouldSatisfy` isLeft
 
+            it "List of Atoms" $ do
+                parseLispVal "(test1 test2)" 
+                    `shouldBe` Right (List [Atom "test1", Atom "test2"])
 
-{-
-        it "Hex number" $ do
-            parseLispVal "#x1A"
-                `shouldBe` Right (Number 26)
+            it "List of Lists" $ do
+                parseLispVal "(test1 (test2 (test3)))"
+                    `shouldBe` Right (List [Atom "test1",
+                                        List [Atom "test2",
+                                            List [Atom "test3"]]])
 
-        it "Octal number" $ do
-            parseLispVal "#o14"
-                `shouldBe` Right (Number 12)
-
-        it "Binary number" $ do
-            parseLispVal "#b10"
-                `shouldBe` Right (Number 2)
-
-        it "Decimal number prefixed" $ do
-            parseLispVal "#d10"
-                `shouldBe` Right (Number 10)
--}
+        describe "Dotted List parsing" $ do
+            it "Dotted list of Atoms" $ do
+                parseLispVal "(test1 . test2)" 
+                    `shouldBe` Right (DottedList [(Atom "test1")] 
+                                        (Atom "test2"))
 
