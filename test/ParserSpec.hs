@@ -61,6 +61,20 @@ spec = do
                 parseLispVal "\"\\\"hello\\\" world\""
                     `shouldBe` Right (String "\\\"hello\\\" world")
 
+        describe "Escaped characters" $ do
+            it "Simple example" $ do
+                parseLispVal "#\\a"
+                    `shouldBe` Right (String "a")
+
+            it "Newline" $ do
+                parseLispVal "#\\newline"
+                    `shouldBe` Right (String "\n")
+
+            it "Space" $ do
+                parseLispVal "#\\space"
+                    `shouldBe` Right (String " ")
+
+
         describe "Number parsing" $ do
             it "Decimal number no prefix" $ do
                 parseLispVal "10"
