@@ -28,8 +28,16 @@ spec = do
                 parseLispVal "#t"
                     `shouldBe` Right (Bool True)
 
+            it "Boolean true capital" $ do
+                parseLispVal "#T"
+                    `shouldBe` Right (Bool True)
+
             it "Boolean false" $ do
                 parseLispVal "#f"
+                    `shouldBe` Right (Bool False)
+
+            it "Boolean false capital" $ do
+                parseLispVal "#F"
                     `shouldBe` Right (Bool False)
 
             it "Quoted atom" $ do
@@ -53,10 +61,6 @@ spec = do
                 parseLispVal "\"\\\"hello\\\" world\""
                     `shouldBe` Right (String "\\\"hello\\\" world")
 
-            it "escaped char" $ do
-                parseLispVal "\"\\nhello world\""
-                    `shouldBe` Right (String "\\nhello world")
-
         describe "Number parsing" $ do
             it "Decimal number no prefix" $ do
                 parseLispVal "10"
@@ -66,16 +70,32 @@ spec = do
                 parseLispVal "#x1A"
                     `shouldBe` Right (Number 26)
 
+            it "Hex number capital prefix" $ do
+                parseLispVal "#X1A"
+                    `shouldBe` Right (Number 26)
+
             it "Octal number" $ do
                 parseLispVal "#o14"
+                    `shouldBe` Right (Number 12)
+
+            it "Octal number capital prefix" $ do
+                parseLispVal "#O14"
                     `shouldBe` Right (Number 12)
 
             it "Binary number" $ do
                 parseLispVal "#b10"
                     `shouldBe` Right (Number 2)
 
+            it "Binary number capital prefix" $ do
+                parseLispVal "#B10"
+                    `shouldBe` Right (Number 2)
+
             it "Decimal number prefixed" $ do
                 parseLispVal "#d10"
+                    `shouldBe` Right (Number 10)
+
+            it "Decimal number capital prefixed" $ do
+                parseLispVal "#D10"
                     `shouldBe` Right (Number 10)
 
         describe "List parsing" $ do
@@ -102,4 +122,19 @@ spec = do
                 parseLispVal "(test1 . test2)" 
                     `shouldBe` Right (DottedList [(Atom "test1")] 
                                         (Atom "test2"))
+
+        describe "Vector parsing" $ do
+            it "Vector of Atoms" $ do
+                parseLispVal "#(test1)"
+                    `shouldBe` Right (Vector [Atom "test1"])
+
+            it "Vector of Atoms" $ do
+                parseLispVal "#(test1 test2)" 
+                    `shouldBe` Right (Vector [Atom "test1", Atom "test2"])
+
+            it "Vector of Vector" $ do
+                parseLispVal "#(test1 #(test2 #(test3)))"
+                    `shouldBe` Right (Vector [Atom "test1",
+                                        Vector [Atom "test2",
+                                            Vector [Atom "test3"]]])
 

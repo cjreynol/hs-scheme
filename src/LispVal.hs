@@ -16,5 +16,6 @@ data LispVal = Atom String
                 | List [LispVal]
                 | Number Integer
                 | String String
+                | Vector [LispVal]
     deriving (Eq, Show)
 

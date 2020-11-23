@@ -15,13 +15,13 @@ import Data.Void            (Void)
 import Text.Megaparsec      (Parsec, ParseErrorBundle, (<|>), endBy, 
                             many, noneOf, oneOf, runParser, sepBy1, 
                             some, try)
-import Text.Megaparsec.Char (char, digitChar, letterChar, space1,
+import Text.Megaparsec.Char (char, char', digitChar, letterChar, space1,
                             binDigitChar, octDigitChar, hexDigitChar,
                             alphaNumChar)
 
 import Extra                (toBase)
 import LispVal              (LispVal(Atom, Bool, DottedList, List, 
-                            Number, String))
+                            Number, String, Vector))
 
 
 type Parser = Parsec Void String
@@ -43,9 +43,9 @@ parseExpr = parsePound
     <|> parseQuoted
     <|> do 
         _ <- char '('
-        x <- try parseList <|> parseDottedList
+        val <- try parseList <|> parseDottedList
         _ <- char ')'
-        return x
+        return val
 
 parseAtom :: Parser LispVal
 parseAtom = do
@@ -65,6 +65,9 @@ parseDottedList = do
     h <- endBy parseExpr space1
     t <- char '.' >> space1 >> parseExpr
     return $ DottedList h t
+
+parseDataList :: Parser [LispVal]
+parseDataList = sepBy1 parseExpr space1
 
 parseQuoted :: Parser LispVal
 parseQuoted = do
@@ -93,28 +96,38 @@ parseDec = do
 parsePound :: Parser LispVal
 parsePound = do
     _ <- char '#'
-    parseBool <|> parseBin <|> parseOct <|> parsePreDec <|> parseHex
+    parseBool 
+        <|> parseBin 
+        <|> parseOct 
+        <|> parsePrefixedDec 
+        <|> parseHex
+        <|> parseVector
     where
         parseBool = parseTrue <|> parseFalse
         parseTrue = do
-            _ <- char 't'
+            _ <- char' 't'
             return $ Bool True
         parseFalse = do
-            _ <- char 'f'
+            _ <- char' 'f'
             return $ Bool False
         parseBin = do
-            _ <- char 'b'
+            _ <- char' 'b'
             bNumStr <- some binDigitChar
             return $ Number (toBase 2 bNumStr)
-        parsePreDec = do
-            _ <- char 'd'
+        parsePrefixedDec = do
+            _ <- char' 'd'
             parseDec
         parseOct = do
-            _ <- char 'o'
+            _ <- char' 'o'
             oNumStr <- some octDigitChar
             return $ Number (toBase 8 oNumStr)
         parseHex = do
-            _ <- char 'x'
+            _ <- char' 'x'
             hNumStr <- some hexDigitChar
             return $ Number (toBase 16 hNumStr)
+        parseVector = do
+            _ <- char '('
+            val <- parseDataList
+            _ <- char ')'
+            return $ Vector val
 
