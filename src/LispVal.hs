@@ -6,7 +6,8 @@ License     : MIT
 -}
 
 module LispVal (
-    LispVal(..)
+      LispVal(..)
+    , quoteAtom
     ) where
 
 
@@ -18,4 +19,7 @@ data LispVal = Atom String
                 | String String
                 | Vector [LispVal]
     deriving (Eq, Show)
+
+quoteAtom :: LispVal
+quoteAtom = Atom "quote"
 
