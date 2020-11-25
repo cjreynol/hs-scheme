@@ -66,6 +66,10 @@ spec = do
                 parseLispVal "#\\a"
                     `shouldBe` Right (String "a")
 
+            it "Simple example 2" $ do
+                parseLispVal "#\\x"
+                    `shouldBe` Right (String "x")
+
             it "Newline" $ do
                 parseLispVal "#\\newline"
                     `shouldBe` Right (String "\n")

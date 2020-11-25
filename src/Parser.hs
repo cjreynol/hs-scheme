@@ -48,7 +48,7 @@ parseAtom :: Parser LispVal
 parseAtom = do
     first <- letterChar <|> symbolChar
     rest <- many (alphaNumChar <|> symbolChar)
-    return $ Atom (first : rest)
+    pure $ Atom (first : rest)
     where
         symbolChar :: Parser Char
         symbolChar = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -60,7 +60,7 @@ parseDottedList :: Parser LispVal
 parseDottedList = do
     first <- endBy parseExpr space1
     rest <- char '.' >> space1 >> parseExpr
-    return $ DottedList first rest
+    pure $ DottedList first rest
 
 parseDataList :: Parser [LispVal]
 parseDataList = sepBy1 parseExpr space1
@@ -68,7 +68,7 @@ parseDataList = sepBy1 parseExpr space1
 parseQuoted :: Parser LispVal
 parseQuoted = do
     x <- char '\'' >> parseExpr
-    return $ List [quoteAtom, x]
+    pure $ List [quoteAtom, x]
 
 parseString :: Parser LispVal
 parseString = String <$> betweenDQuotes 
@@ -78,9 +78,7 @@ parseString = String <$> betweenDQuotes
         escapeChar = oneOf "\"nrt\\"
 
 parseDec :: Parser LispVal
-parseDec = do
-    dNumStr <- some digitChar
-    return $ Number (toBase 10 dNumStr)
+parseDec = Number . (toBase 10) <$> some digitChar
 
 parsePound :: Parser LispVal
 parsePound = char '#' >> 
@@ -94,39 +92,37 @@ parsePound = char '#' >>
     where
         parseBool :: Parser LispVal
         parseBool = parseTrue <|> parseFalse
+
         parseTrue :: Parser LispVal
-        parseTrue = do
-            _ <- char' 't'
-            return $ Bool True
+        parseTrue = char' 't' >> pure (Bool True)
+
         parseFalse :: Parser LispVal
-        parseFalse = do
-            _ <- char' 'f'
-            return $ Bool False
+        parseFalse = char' 'f' >> pure (Bool False)
+
         parseBin :: Parser LispVal
-        parseBin = do
-            _ <- char' 'b'
-            bNumStr <- some binDigitChar
-            return $ Number (toBase 2 bNumStr)
+        parseBin = char' 'b' >> 
+            Number . (toBase 2) <$> some binDigitChar
+
         parsePrefixedDec :: Parser LispVal
         parsePrefixedDec = char' 'd' >> parseDec
+
         parseOct :: Parser LispVal
-        parseOct = do
-            _ <- char' 'o'
-            oNumStr <- some octDigitChar
-            return $ Number (toBase 8 oNumStr)
+        parseOct = char' 'o' >>
+            Number . (toBase 8) <$> some octDigitChar
+
         parseHex :: Parser LispVal
-        parseHex = do
-            _ <- char' 'x'
-            hNumStr <- some hexDigitChar
-            return $ Number (toBase 16 hNumStr)
+        parseHex = char' 'x' >>
+            Number . (toBase 16) <$> some hexDigitChar
+
         parseVector :: Parser LispVal
         parseVector = Vector <$> betweenParens parseDataList
+
         parseChar :: Parser LispVal
         parseChar = do
             _ <- char '\\'
             first <- alphaNumChar
             rest <- many letterChar
-            return $ case (first:rest) of
+            pure $ case (first:rest) of
                 "newline" -> String "\n"
                 "space" -> String " "
                 (first':[]) -> String [first']
