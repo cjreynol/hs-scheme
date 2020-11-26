@@ -18,7 +18,21 @@ data LispVal = Atom String
                 | Number Integer
                 | String String
                 | Vector [LispVal]
-    deriving (Eq, Show)
+    deriving (Eq)
+
+instance Show LispVal where 
+    show (Atom str) = str
+    show (Bool True) = "#t"
+    show (Bool False) = "#f"
+    show (DottedList lvs lv) = "(" 
+        ++ (unwords . map show) lvs
+        ++ "."
+        ++ show lv
+        ++ ")"
+    show (List lvs) = "(" ++ (unwords . map show) lvs ++ ")"
+    show (Number n) = show n
+    show (String str) = str
+    show (Vector lvs) = "#(" ++ (unwords . map show) lvs ++ ")"
 
 quoteAtom :: LispVal
 quoteAtom = Atom "quote"
