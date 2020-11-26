@@ -72,10 +72,10 @@ parseQuoted = do
 
 parseString :: Parser LispVal
 parseString = String <$> betweenDQuotes 
-    (many $ (noneOf "\"") <|> (char '\\' >> escapeChar))
+    (many $ (noneOf escapedChars) <|> (char '\\' >> oneOf escapedChars))
     where
-        escapeChar :: Parser Char
-        escapeChar = oneOf "\"nrt\\"
+        escapedChars :: String
+        escapedChars = "\"\\"
 
 parseDec :: Parser LispVal
 parseDec = Number . (toBase 10) <$> some digitChar

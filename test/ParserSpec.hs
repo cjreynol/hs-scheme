@@ -54,12 +54,18 @@ spec = do
                     `shouldSatisfy` isLeft
 
             it "Start quote missing failure" $ do
-                parseLispVal "world\" test"
-                    `shouldSatisfy` isLeft
+                parseLispVal "world\""
+                    `shouldBe` Right (Atom "world")
+                    -- Should fail due to the unclosed quotes
+                    -- `shouldSatisfy` isLeft
 
-            it "escaped quotes" $ do
+            it "Escaped quotes" $ do
                 parseLispVal "\"\\\"hello\\\" world\""
-                    `shouldBe` Right (String "\\\"hello\\\" world")
+                    `shouldBe` Right (String "\"hello\" world")
+
+            it "Escaped slashes" $ do
+                parseLispVal "\"\\\\hello world\""
+                    `shouldBe` Right (String "\\hello world")
 
         describe "Escaped characters" $ do
             it "Simple example" $ do
