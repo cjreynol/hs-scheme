@@ -6,15 +6,15 @@ License     : MIT
 -}
 
 module Extra (
-      toBase
+      baseToDec
     ) where
 
 import Data.Char            (digitToInt)
 import Data.Foldable        (foldl')
 
 
-toBase :: Int -> String -> Integer
-toBase base str = toInteger $ foldl' 
+baseToDec :: Int -> String -> Integer
+baseToDec base str = toInteger $ foldl' 
     (\acc x -> acc * base + digitToInt x)
     0
     str

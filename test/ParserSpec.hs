@@ -32,12 +32,20 @@ spec = do
                 parseLispVal "#T"
                     `shouldBe` Right (Bool True)
 
+            it "Boolean true word" $ do
+                parseLispVal "#true"
+                    `shouldBe` Right (Bool True)
+
             it "Boolean false" $ do
                 parseLispVal "#f"
                     `shouldBe` Right (Bool False)
 
             it "Boolean false capital" $ do
                 parseLispVal "#F"
+                    `shouldBe` Right (Bool False)
+
+            it "Boolean false word" $ do
+                parseLispVal "#false"
                     `shouldBe` Right (Bool False)
 
             it "Quoted atom" $ do
@@ -88,8 +96,24 @@ spec = do
                 parseLispVal "10"
                     `shouldBe` Right (Number 10)
 
+            it "Negative decimal number no prefix" $ do
+                parseLispVal "-10"
+                    `shouldBe` Right (Number (-10))
+
+            it "Positive decimal number no prefix" $ do
+                parseLispVal "-10"
+                    `shouldBe` Right (Number 10)
+
             it "Hex number" $ do
                 parseLispVal "#x1A"
+                    `shouldBe` Right (Number 26)
+
+            it "Negative hex number" $ do
+                parseLispVal "#x-1A"
+                    `shouldBe` Right (Number (-26))
+
+            it "Positive hex number" $ do
+                parseLispVal "#x+1A"
                     `shouldBe` Right (Number 26)
 
             it "Hex number capital prefix" $ do
@@ -100,6 +124,14 @@ spec = do
                 parseLispVal "#o14"
                     `shouldBe` Right (Number 12)
 
+            it "Negative octal number" $ do
+                parseLispVal "#o-14"
+                    `shouldBe` Right (Number (-12))
+
+            it "Positive octal number" $ do
+                parseLispVal "#o+14"
+                    `shouldBe` Right (Number 12)
+
             it "Octal number capital prefix" $ do
                 parseLispVal "#O14"
                     `shouldBe` Right (Number 12)
@@ -108,12 +140,28 @@ spec = do
                 parseLispVal "#b10"
                     `shouldBe` Right (Number 2)
 
+            it "Negative binary number" $ do
+                parseLispVal "#b-10"
+                    `shouldBe` Right (Number (-2))
+
+            it "Positive binary number" $ do
+                parseLispVal "#b+10"
+                    `shouldBe` Right (Number 2)
+
             it "Binary number capital prefix" $ do
                 parseLispVal "#B10"
                     `shouldBe` Right (Number 2)
 
             it "Decimal number prefixed" $ do
                 parseLispVal "#d10"
+                    `shouldBe` Right (Number 10)
+
+            it "Negative decimal number prefixed" $ do
+                parseLispVal "#d-10"
+                    `shouldBe` Right (Number (-10))
+
+            it "Positive decimal number prefixed" $ do
+                parseLispVal "#d+10"
                     `shouldBe` Right (Number 10)
 
             it "Decimal number capital prefixed" $ do
@@ -142,11 +190,11 @@ spec = do
         describe "Dotted List parsing" $ do
             it "Dotted list of Atoms" $ do
                 parseLispVal "(test1 . test2)" 
-                    `shouldBe` Right (DottedList [(Atom "test1")] 
+                    `shouldBe` Right (DottedList [Atom "test1"] 
                                         (Atom "test2"))
 
         describe "Vector parsing" $ do
-            it "Vector of Atoms" $ do
+            it "Vector of single Atom" $ do
                 parseLispVal "#(test1)"
                     `shouldBe` Right (Vector [Atom "test1"])
 

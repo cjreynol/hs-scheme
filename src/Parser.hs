@@ -5,6 +5,13 @@ Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
+-- TODO:  #true and #false  (I think I leave "rue" and "alse" unconsumed, new tests)
+-- TODO:  fix parsing failure
+-- TODO:  Add Nil datatype?  Or let it be a special case (empty) of list?
+-- TODO:  Update README with all of the links I am referencing
+-- TODO:  Swap from String to Text
+-- TODO:  negatives and positive prefixed numbers
+
 module Parser (
       parseLispVal
     , readExpr
@@ -20,7 +27,7 @@ import Text.Megaparsec.Char         (char, char', digitChar, letterChar, space1,
                                     alphaNumChar)
 import Text.Megaparsec.Char.Lexer   (space, symbol)
 
-import Extra                        (toBase)
+import Extra                        (baseToDec, baseToDec)
 import LispVal                      (LispVal(Atom, Bool, DottedList, List,
                                     Number, String, Vector), quoteAtom, 
                                     toSchemeString)
@@ -38,7 +45,7 @@ parseLispVal :: String -> Either ParserError LispVal
 parseLispVal input = runParser parseExpr "lisp" input
 
 parseExpr :: Parser LispVal
-parseExpr = parsePound
+parseExpr = parseReserved
     <|> parseAtom 
     <|> parseString
     <|> parseDec
@@ -55,7 +62,7 @@ parseAtom = do
         symbolChar = oneOf "!#$%&|*+-/:<=>?@^_~"
 
 parseList :: Parser LispVal
-parseList = List <$> (sepBy1 parseExpr space1)
+parseList = List <$> sepBy1 parseExpr space1
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
@@ -73,16 +80,16 @@ parseQuoted = do
 
 parseString :: Parser LispVal
 parseString = String <$> betweenDQuotes 
-    (many $ (noneOf escapedChars) <|> (char '\\' >> oneOf escapedChars))
+    (many $ noneOf escapedChars <|> (char '\\' >> oneOf escapedChars))
     where
         escapedChars :: String
         escapedChars = "\"\\"
 
 parseDec :: Parser LispVal
-parseDec = Number . (toBase 10) <$> some digitChar
+parseDec = Number <$> parseDigits 10 digitChar
 
-parsePound :: Parser LispVal
-parsePound = char '#' >> 
+parseReserved :: Parser LispVal
+parseReserved = char '#' >> 
     parseBool 
     <|> parseBin 
     <|> parseOct 
@@ -102,18 +109,18 @@ parsePound = char '#' >>
 
         parseBin :: Parser LispVal
         parseBin = char' 'b' >> 
-            Number . (toBase 2) <$> some binDigitChar
+            Number <$> parseDigits 2 binDigitChar 
 
         parsePrefixedDec :: Parser LispVal
         parsePrefixedDec = char' 'd' >> parseDec
 
         parseOct :: Parser LispVal
         parseOct = char' 'o' >>
-            Number . (toBase 8) <$> some octDigitChar
+            Number <$> parseDigits 8 octDigitChar  
 
         parseHex :: Parser LispVal
         parseHex = char' 'x' >>
-            Number . (toBase 16) <$> some hexDigitChar
+            Number <$> parseDigits 16 hexDigitChar 
 
         parseVector :: Parser LispVal
         parseVector = Vector <$> betweenParens parseDataList
@@ -123,10 +130,10 @@ parsePound = char '#' >>
             _ <- char '\\'
             first <- alphaNumChar
             rest <- many letterChar
-            pure $ case (first:rest) of
+            pure $ case first : rest of
                 "newline" -> String "\n"
                 "space" -> String " "
-                (first':[]) -> String [first']
+                [first'] -> String [first']
                 _ -> error "need to raise a parser error"
 
 betweenParens :: Parser a -> Parser a
@@ -141,3 +148,5 @@ symbolParse = symbol spaceConsumer
 spaceConsumer :: Parser ()
 spaceConsumer = space space1 empty empty
 
+parseDigits :: Int -> Parser Char -> Parser Integer
+parseDigits base charSetParser = baseToDec base <$> some charSetParser

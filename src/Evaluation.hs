@@ -9,8 +9,13 @@ module Evaluation (
       evaluate
     ) where
 
-import LispVal (LispVal)
+import LispVal  (LispVal(Atom, Bool, DottedList, List, Number, String, 
+                Vector), quoteAtom)
 
 
 evaluate :: LispVal -> LispVal
-evaluate = undefined
+evaluate val@(String _) = val
+evaluate val@(Bool _) = val
+evaluate val@(Number _) = val
+evaluate (List [quoteAtom, val]) = val
+evaluate _ = error "not yet implemented"
