@@ -17,11 +17,12 @@ module Parser (
     , readExpr
     ) where
 
+import Control.Applicative          (liftA2)
 import Data.Void                    (Void)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), endBy, 
                                     many, noneOf, oneOf, runParser, sepBy1, 
-                                    some, try, between, empty)
+                                    some, try, between, empty, lookAhead, anySingle)
 import Text.Megaparsec.Char         (char, char', digitChar, letterChar, space1,
                                     binDigitChar, octDigitChar, hexDigitChar,
                                     alphaNumChar)
@@ -86,7 +87,7 @@ parseString = String <$> betweenDQuotes
         escapedChars = "\"\\"
 
 parseDec :: Parser LispVal
-parseDec = Number <$> parseDigits 10 digitChar
+parseDec = Number <$> liftA2 (*) parseSign (parseDigits 10 digitChar)
 
 parseReserved :: Parser LispVal
 parseReserved = char '#' >> 
@@ -109,18 +110,18 @@ parseReserved = char '#' >>
 
         parseBin :: Parser LispVal
         parseBin = char' 'b' >> 
-            Number <$> parseDigits 2 binDigitChar 
+            Number <$> liftA2 (*) parseSign (parseDigits 2 binDigitChar)
 
         parsePrefixedDec :: Parser LispVal
         parsePrefixedDec = char' 'd' >> parseDec
 
         parseOct :: Parser LispVal
         parseOct = char' 'o' >>
-            Number <$> parseDigits 8 octDigitChar  
+            Number <$> liftA2 (*) parseSign (parseDigits 8 octDigitChar)
 
         parseHex :: Parser LispVal
         parseHex = char' 'x' >>
-            Number <$> parseDigits 16 hexDigitChar 
+            Number <$> liftA2 (*) parseSign (parseDigits 16 hexDigitChar)
 
         parseVector :: Parser LispVal
         parseVector = Vector <$> betweenParens parseDataList
@@ -150,3 +151,11 @@ spaceConsumer = space space1 empty empty
 
 parseDigits :: Int -> Parser Char -> Parser Integer
 parseDigits base charSetParser = baseToDec base <$> some charSetParser
+
+parseSign :: Parser Integer
+parseSign = do
+    nextChar <- lookAhead anySingle 
+    case nextChar of
+        '-' -> char '-' >> pure (-1)
+        '+' -> char '+' >> pure 1
+        _ -> pure 1

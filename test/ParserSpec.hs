@@ -173,6 +173,7 @@ spec = do
                 parseLispVal "(test1)"
                     `shouldBe` Right (List [Atom "test1"])
 
+            -- TODO:  Should be accepted as Nil
             it "Empty List not accepted" $ do
                 parseLispVal "()"
                     `shouldSatisfy` isLeft
