@@ -47,9 +47,9 @@ parseLispVal input = runParser parseExpr "lisp" input
 
 parseExpr :: Parser LispVal
 parseExpr = parseReserved
+    <|> parseDec
     <|> parseAtom 
     <|> parseString
-    <|> parseDec
     <|> parseQuoted
     <|> betweenParens (try parseList <|> parseDottedList)
 

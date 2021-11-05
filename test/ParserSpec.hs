@@ -101,7 +101,7 @@ spec = do
                     `shouldBe` Right (Number (-10))
 
             it "Positive decimal number no prefix" $ do
-                parseLispVal "-10"
+                parseLispVal "+10"
                     `shouldBe` Right (Number 10)
 
             it "Hex number" $ do
