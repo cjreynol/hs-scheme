@@ -1,7 +1,7 @@
 {-|
 Module      : Main
 Description : The main program
-Copyright   : (c) Chad Reynolds, 2020
+Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 

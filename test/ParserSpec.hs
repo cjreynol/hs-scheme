@@ -55,9 +55,7 @@ spec = do
 
             it "Start quote missing failure" $ do
                 parseLispVal "world\""
-                    `shouldBe` Right (Atom "world")
-                    -- Should fail due to the unclosed quotes
-                    -- `shouldSatisfy` isLeft
+                    `shouldSatisfy` isLeft
 
             it "Escaped quotes" $ do
                 parseLispVal "\"\\\"hello\\\" world\""

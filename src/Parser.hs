@@ -1,7 +1,7 @@
 {-|
 Module      : Parser
 Description : The Scheme languge parser
-Copyright   : (c) Chad Reynolds, 2020
+Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
@@ -10,19 +10,20 @@ module Parser (
     , readExpr
     ) where
 
-import Data.Void            (Void)
+import Data.Void                    (Void)
 
-import Text.Megaparsec      (Parsec, ParseErrorBundle, (<|>), endBy, 
-                            many, noneOf, oneOf, runParser, sepBy1, 
-                            some, try, between, empty)
-import Text.Megaparsec.Char (char, char', digitChar, letterChar, space1,
-                            binDigitChar, octDigitChar, hexDigitChar,
-                            alphaNumChar)
-import Text.Megaparsec.Char.Lexer (space, symbol)
+import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), endBy, 
+                                    many, noneOf, oneOf, runParser, sepBy1, 
+                                    some, try, between, empty)
+import Text.Megaparsec.Char         (char, char', digitChar, letterChar, space1,
+                                    binDigitChar, octDigitChar, hexDigitChar,
+                                    alphaNumChar)
+import Text.Megaparsec.Char.Lexer   (space, symbol)
 
-import Extra                (toBase)
-import LispVal              (LispVal(Atom, Bool, DottedList, List, 
-                            Number, String, Vector), quoteAtom)
+import Extra                        (toBase)
+import LispVal                      (LispVal(Atom, Bool, DottedList, List,
+                                    Number, String, Vector), quoteAtom, 
+                                    toSchemeString)
 
 
 type Parser = Parsec Void String
@@ -30,7 +31,7 @@ type ParserError = ParseErrorBundle String Void
 
 readExpr :: String -> String
 readExpr input = case parseLispVal input of
-    Right val -> "Match\n" ++ show val
+    Right val -> "Match\n" ++ toSchemeString val
     Left err -> "No match\n" ++ show err
 
 parseLispVal :: String -> Either ParserError LispVal

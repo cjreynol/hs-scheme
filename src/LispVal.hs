@@ -1,13 +1,14 @@
 {-|
 Module      : LispVal
 Description : The datatype for scheme language constructs
-Copyright   : (c) Chad Reynolds, 2020
+Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
 module LispVal (
       LispVal(..)
     , quoteAtom
+    , toSchemeString
     ) where
 
 
@@ -18,21 +19,22 @@ data LispVal = Atom String
                 | Number Integer
                 | String String
                 | Vector [LispVal]
-    deriving (Eq)
+    deriving (Eq, Show)
 
-instance Show LispVal where 
-    show (Atom str) = str
-    show (Bool True) = "#t"
-    show (Bool False) = "#f"
-    show (DottedList lvs lv) = "(" 
-        ++ (unwords . map show) lvs
-        ++ "."
-        ++ show lv
-        ++ ")"
-    show (List lvs) = "(" ++ (unwords . map show) lvs ++ ")"
-    show (Number n) = show n
-    show (String str) = str
-    show (Vector lvs) = "#(" ++ (unwords . map show) lvs ++ ")"
+
+toSchemeString :: LispVal -> String
+toSchemeString (Atom str) = str
+toSchemeString (Bool True) = "#t"
+toSchemeString (Bool False) = "#f"
+toSchemeString (DottedList lvs lv) = "(" 
+    ++ (unwords . map toSchemeString) lvs
+    ++ "."
+    ++ toSchemeString lv
+    ++ ")"
+toSchemeString (List lvs) = "(" ++ (unwords . map toSchemeString) lvs ++ ")"
+toSchemeString (Number n) = show n
+toSchemeString (String str) = str
+toSchemeString (Vector lvs) = "#(" ++ (unwords . map toSchemeString) lvs ++ ")"
 
 quoteAtom :: LispVal
 quoteAtom = Atom "quote"

@@ -1,7 +1,7 @@
 {-|
 Module      : Extra
 Description : Helper functions that do not belong with other logic
-Copyright   : (c) Chad Reynolds, 2020
+Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
