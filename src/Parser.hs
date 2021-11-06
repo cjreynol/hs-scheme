@@ -5,12 +5,6 @@ Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
--- TODO:  #true and #false  (I think I leave "rue" and "alse" unconsumed, new tests)
--- TODO:  fix parsing failure
--- TODO:  Add Nil datatype?  Or let it be a special case (empty) of list?
--- TODO:  Update README with all of the links I am referencing
--- TODO:  Swap from String to Text
--- TODO:  negatives and positive prefixed numbers
 
 module Parser (
       parseLispVal
@@ -20,17 +14,18 @@ module Parser (
 import Control.Applicative          (liftA2)
 import Data.Void                    (Void)
 
-import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), endBy, 
-                                    many, noneOf, oneOf, runParser, sepBy1, 
-                                    some, try, between, empty, lookAhead, anySingle)
-import Text.Megaparsec.Char         (char, char', digitChar, letterChar, space1,
-                                    binDigitChar, octDigitChar, hexDigitChar,
-                                    alphaNumChar)
+import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
+                                    endBy, lookAhead, many, noneOf, oneOf, 
+                                    runParser, sepBy1, some, try, between, 
+                                    empty)
+import Text.Megaparsec.Char         (alphaNumChar, char, char', digitChar, 
+                                    letterChar, space1, binDigitChar, 
+                                    octDigitChar, hexDigitChar)
 import Text.Megaparsec.Char.Lexer   (space, symbol)
 
 import Extra                        (baseToDec, baseToDec)
 import LispVal                      (LispVal(Atom, Bool, DottedList, List,
-                                    Number, String, Vector), quoteAtom, 
+                                    Number, String, Vector), quoteAtom,
                                     toSchemeString)
 
 
@@ -43,12 +38,12 @@ readExpr input = case parseLispVal input of
     Left err -> "No match\n" ++ show err
 
 parseLispVal :: String -> Either ParserError LispVal
-parseLispVal input = runParser parseExpr "lisp" input
+parseLispVal = runParser parseExpr "lisp"
 
 parseExpr :: Parser LispVal
 parseExpr = parseReserved
     <|> parseDec
-    <|> parseAtom 
+    <|> parseAtom
     <|> parseString
     <|> parseQuoted
     <|> betweenParens (try parseList <|> parseDottedList)
@@ -80,7 +75,7 @@ parseQuoted = do
     pure $ List [quoteAtom, x]
 
 parseString :: Parser LispVal
-parseString = String <$> betweenDQuotes 
+parseString = String <$> betweenDQuotes
     (many $ noneOf escapedChars <|> (char '\\' >> oneOf escapedChars))
     where
         escapedChars :: String
@@ -90,11 +85,11 @@ parseDec :: Parser LispVal
 parseDec = Number <$> liftA2 (*) parseSign (parseDigits 10 digitChar)
 
 parseReserved :: Parser LispVal
-parseReserved = char '#' >> 
-    parseBool 
-    <|> parseBin 
-    <|> parseOct 
-    <|> parsePrefixedDec 
+parseReserved = char '#' >>
+    parseBool
+    <|> parseBin
+    <|> parseOct
+    <|> parsePrefixedDec
     <|> parseHex
     <|> parseVector
     <|> parseChar
@@ -109,7 +104,7 @@ parseReserved = char '#' >>
         parseFalse = char' 'f' >> pure (Bool False)
 
         parseBin :: Parser LispVal
-        parseBin = char' 'b' >> 
+        parseBin = char' 'b' >>
             Number <$> liftA2 (*) parseSign (parseDigits 2 binDigitChar)
 
         parsePrefixedDec :: Parser LispVal
@@ -154,7 +149,7 @@ parseDigits base charSetParser = baseToDec base <$> some charSetParser
 
 parseSign :: Parser Integer
 parseSign = do
-    nextChar <- lookAhead anySingle 
+    nextChar <- lookAhead anySingle
     case nextChar of
         '-' -> char '-' >> pure (-1)
         '+' -> char '+' >> pure 1

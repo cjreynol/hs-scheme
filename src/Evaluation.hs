@@ -17,5 +17,5 @@ evaluate :: LispVal -> LispVal
 evaluate val@(String _) = val
 evaluate val@(Bool _) = val
 evaluate val@(Number _) = val
-evaluate (List [quoteAtom, val]) = val
+evaluate (List [Atom "quote", val]) = val
 evaluate _ = error "not yet implemented"
