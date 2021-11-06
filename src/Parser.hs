@@ -6,12 +6,15 @@ License     : MIT
 -}
 
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module Parser (
       parseLispVal
     , readExpr
     ) where
 
 import Control.Applicative          (liftA2)
+import Data.Text                    (Text, pack, singleton, unpack)
 import Data.Void                    (Void)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
@@ -29,15 +32,15 @@ import LispVal                      (LispVal(Atom, Bool, DottedList, List,
                                     toSchemeString)
 
 
-type Parser = Parsec Void String
-type ParserError = ParseErrorBundle String Void
+type Parser = Parsec Void Text
+type ParserError = ParseErrorBundle Text Void
 
 readExpr :: String -> String
-readExpr input = case parseLispVal input of
-    Right val -> "Match\n" ++ toSchemeString val
-    Left err -> "No match\n" ++ show err
+readExpr input = case parseLispVal $ pack input of
+    Right val -> unpack $ "Match\n" <> toSchemeString val
+    Left err -> "No match\n" <> show err
 
-parseLispVal :: String -> Either ParserError LispVal
+parseLispVal :: Text -> Either ParserError LispVal
 parseLispVal = runParser parseExpr "lisp"
 
 parseExpr :: Parser LispVal
@@ -52,10 +55,10 @@ parseAtom :: Parser LispVal
 parseAtom = do
     first <- letterChar <|> symbolChar
     rest <- many (alphaNumChar <|> symbolChar)
-    pure $ Atom (first : rest)
+    pure $ Atom $ pack (first : rest)
     where
         symbolChar :: Parser Char
-        symbolChar = oneOf "!#$%&|*+-/:<=>?@^_~"
+        symbolChar = oneOf $ unpack "!#$%&|*+-/:<=>?@^_~"
 
 parseList :: Parser LispVal
 parseList = List <$> sepBy1 parseExpr space1
@@ -75,8 +78,8 @@ parseQuoted = do
     pure $ List [quoteAtom, x]
 
 parseString :: Parser LispVal
-parseString = String <$> betweenDQuotes
-    (many $ noneOf escapedChars <|> (char '\\' >> oneOf escapedChars))
+parseString = String . pack <$> betweenDQuotes
+        (many $ noneOf escapedChars <|> (char '\\' >> oneOf escapedChars))
     where
         escapedChars :: String
         escapedChars = "\"\\"
@@ -126,11 +129,12 @@ parseReserved = char '#' >>
             _ <- char '\\'
             first <- alphaNumChar
             rest <- many letterChar
-            pure $ case first : rest of
+            pure $ case pack $ first : rest of
                 "newline" -> String "\n"
                 "space" -> String " "
-                [first'] -> String [first']
-                _ -> error "need to raise a parser error"
+                _ -> case rest of 
+                    [] -> String $ singleton first
+                    _ -> error "need to raise a parser error"
 
 betweenParens :: Parser a -> Parser a
 betweenParens = between (symbolParse "(") (symbolParse ")")
@@ -138,7 +142,7 @@ betweenParens = between (symbolParse "(") (symbolParse ")")
 betweenDQuotes :: Parser a -> Parser a
 betweenDQuotes = between (symbolParse "\"") (symbolParse "\"")
 
-symbolParse :: String -> Parser String
+symbolParse :: Text -> Parser Text
 symbolParse = symbol spaceConsumer
 
 spaceConsumer :: Parser ()

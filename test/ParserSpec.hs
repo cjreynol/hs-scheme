@@ -5,6 +5,9 @@ Copyright   : (c) Chad Reynolds, 2020
 License     : MIT
 -}
 
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module ParserSpec (
     spec
     ) where

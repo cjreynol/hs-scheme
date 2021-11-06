@@ -5,36 +5,41 @@ Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module LispVal (
       LispVal(..)
     , quoteAtom
     , toSchemeString
     ) where
 
+import Data.Text    as T    (Text, pack, unwords)
 
-data LispVal = Atom String 
+
+data LispVal = Atom Text 
                 | Bool Bool
                 | DottedList [LispVal] LispVal
                 | List [LispVal]
                 | Number Integer
-                | String String
+                | String Text
                 | Vector [LispVal]
     deriving (Eq, Show)
 
 
-toSchemeString :: LispVal -> String
+toSchemeString :: LispVal -> Text
 toSchemeString (Atom str) = str
 toSchemeString (Bool True) = "#t"
 toSchemeString (Bool False) = "#f"
 toSchemeString (DottedList lvs lv) = "(" 
-    ++ (unwords . map toSchemeString) lvs
-    ++ "."
-    ++ toSchemeString lv
-    ++ ")"
-toSchemeString (List lvs) = "(" ++ (unwords . map toSchemeString) lvs ++ ")"
-toSchemeString (Number n) = show n
+    <> (T.unwords . map toSchemeString) lvs
+    <> "."
+    <> toSchemeString lv
+    <> ")"
+toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
+toSchemeString (Number n) = pack $ show n
 toSchemeString (String str) = str
-toSchemeString (Vector lvs) = "#(" ++ (unwords . map toSchemeString) lvs ++ ")"
+toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
 
 quoteAtom :: LispVal
 quoteAtom = Atom "quote"

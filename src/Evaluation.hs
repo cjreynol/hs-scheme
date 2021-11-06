@@ -5,6 +5,9 @@ Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module Evaluation (
       evaluate
     ) where
