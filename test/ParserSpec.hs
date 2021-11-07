@@ -54,6 +54,10 @@ spec = do
             it "Quoted atom" $ do
                 parseLispVal "'hello"
                     `shouldBe` Right (List [Atom "quote", Atom "hello"])
+            
+            it "Nil" $ do
+                parseLispVal "Nil"
+                    `shouldBe` Right Nil
 
         describe "String parsing" $ do
             it "Simple example" $ do
@@ -176,10 +180,9 @@ spec = do
                 parseLispVal "(test1)"
                     `shouldBe` Right (List [Atom "test1"])
 
-            -- TODO:  Should be accepted as Nil
-            it "Empty List not accepted" $ do
+            it "Empty List is Nil" $ do
                 parseLispVal "()"
-                    `shouldSatisfy` isLeft
+                    `shouldBe` Right Nil
 
             it "List of Atoms" $ do
                 parseLispVal "(test1 test2)" 

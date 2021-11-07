@@ -12,8 +12,8 @@ module Evaluation (
       evaluate
     ) where
 
-import LispVal  (LispVal(Atom, Bool, DottedList, List, Number, String, 
-                Vector), quoteAtom)
+import LispVal  (LispVal(Atom, Bool, DottedList, List, Nil, Number, String, 
+                Vector))
 
 
 evaluate :: LispVal -> LispVal

@@ -10,7 +10,6 @@ License     : MIT
 
 module LispVal (
       LispVal(..)
-    , quoteAtom
     , toSchemeString
     ) where
 
@@ -21,6 +20,7 @@ data LispVal = Atom Text
                 | Bool Bool
                 | DottedList [LispVal] LispVal
                 | List [LispVal]
+                | Nil
                 | Number Integer
                 | String Text
                 | Vector [LispVal]
@@ -37,10 +37,7 @@ toSchemeString (DottedList lvs lv) = "("
     <> toSchemeString lv
     <> ")"
 toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
+toSchemeString Nil = "Nil"
 toSchemeString (Number n) = pack $ show n
 toSchemeString (String str) = str
 toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
-
-quoteAtom :: LispVal
-quoteAtom = Atom "quote"
-

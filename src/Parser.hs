@@ -18,18 +18,17 @@ import Data.Text                    (Text, pack, singleton, unpack)
 import Data.Void                    (Void)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
-                                    endBy, lookAhead, many, noneOf, oneOf, 
-                                    runParser, sepBy1, some, try, between, 
-                                    empty)
-import Text.Megaparsec.Char         (alphaNumChar, char, char', digitChar, 
-                                    letterChar, space1, binDigitChar, 
-                                    octDigitChar, hexDigitChar)
+                                    between, empty, endBy, lookAhead, many, 
+                                    noneOf, oneOf, runParser, sepBy, sepBy1, 
+                                    some, try)
+import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char', 
+                                    digitChar, hexDigitChar, letterChar, 
+                                    octDigitChar, space1, string)
 import Text.Megaparsec.Char.Lexer   (space, symbol)
 
 import Extra                        (baseToDec, baseToDec)
-import LispVal                      (LispVal(Atom, Bool, DottedList, List,
-                                    Number, String, Vector), quoteAtom,
-                                    toSchemeString)
+import LispVal                      (LispVal(Atom, Bool, DottedList, List, Nil,
+                                    Number, String, Vector), toSchemeString)
 
 
 type Parser = Parsec Void Text
@@ -61,7 +60,11 @@ parseAtom = do
         symbolChar = oneOf $ unpack "!#$%&|*+-/:<=>?@^_~"
 
 parseList :: Parser LispVal
-parseList = List <$> sepBy1 parseExpr space1
+parseList = do
+   vals <- sepBy parseExpr space1
+   pure $ case vals of
+       [] -> Nil
+       _ -> List vals
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
@@ -75,7 +78,7 @@ parseDataList = sepBy1 parseExpr space1
 parseQuoted :: Parser LispVal
 parseQuoted = do
     x <- char '\'' >> parseExpr
-    pure $ List [quoteAtom, x]
+    pure $ List [Atom "quote", x]
 
 parseString :: Parser LispVal
 parseString = String . pack <$> betweenDQuotes
@@ -88,15 +91,18 @@ parseDec :: Parser LispVal
 parseDec = Number <$> liftA2 (*) parseSign (parseDigits 10 digitChar)
 
 parseReserved :: Parser LispVal
-parseReserved = char '#' >>
+parseReserved = try parseNil <|> (char '#' >>
     parseBool
     <|> parseBin
     <|> parseOct
     <|> parsePrefixedDec
     <|> parseHex
     <|> parseVector
-    <|> parseChar
+    <|> parseChar)
     where
+        parseNil :: Parser LispVal
+        parseNil = string "Nil" >> pure Nil
+
         parseBool :: Parser LispVal
         parseBool = parseTrue <|> parseFalse
 
