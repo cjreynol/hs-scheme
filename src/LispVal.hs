@@ -10,6 +10,7 @@ License     : MIT
 
 module LispVal (
       LispVal(..)
+    , getNumber
     , toSchemeString
     ) where
 
@@ -41,3 +42,7 @@ toSchemeString Nil = "Nil"
 toSchemeString (Number n) = pack $ show n
 toSchemeString (String str) = str
 toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
+
+getNumber :: LispVal -> Integer
+getNumber (Number n) = n
+getNumber _ = 0
