@@ -54,7 +54,7 @@ spec = do
             it "Quoted atom" $ do
                 parseLispVal "'hello"
                     `shouldBe` Right (List [Atom "quote", Atom "hello"])
-            
+
             it "Nil" $ do
                 parseLispVal "Nil"
                     `shouldBe` Right Nil
@@ -180,9 +180,9 @@ spec = do
                 parseLispVal "(test1)"
                     `shouldBe` Right (List [Atom "test1"])
 
-            it "Empty List is Nil" $ do
+            it "Empty List" $ do
                 parseLispVal "()"
-                    `shouldBe` Right Nil
+                    `shouldBe` Right (List [])
 
             it "List of Atoms" $ do
                 parseLispVal "(test1 test2)" 

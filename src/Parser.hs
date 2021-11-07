@@ -60,11 +60,7 @@ parseAtom = do
         symbolChar = oneOf $ unpack "!#$%&|*+-/:<=>?@^_~"
 
 parseList :: Parser LispVal
-parseList = do
-   vals <- sepBy parseExpr space1
-   pure $ case vals of
-       [] -> Nil
-       _ -> List vals
+parseList = List <$> sepBy parseExpr space1
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
