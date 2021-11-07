@@ -1,7 +1,7 @@
 {-|
 Module      : ParserSpec
 Description : The parser tests
-Copyright   : (c) Chad Reynolds, 2020
+Copyright   : (c) Chad Reynolds, 2021
 License     : MIT
 -}
 
