@@ -18,9 +18,9 @@ import Data.Text                    (Text, pack, singleton, unpack)
 import Data.Void                    (Void)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
-                                    between, empty, endBy, lookAhead, many, 
-                                    noneOf, oneOf, runParser, sepBy, sepBy1, 
-                                    some, try)
+                                    between, empty, endBy, eof, lookAhead, many, 
+                                    noneOf, oneOf, optional, runParser, sepBy, 
+                                    sepBy1, some, try)
 import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char', 
                                     digitChar, hexDigitChar, letterChar, 
                                     octDigitChar, space1, string)
@@ -40,7 +40,7 @@ readExpr input = case parseLispVal $ pack input of
     Left err -> "No match\n" <> show err
 
 parseLispVal :: Text -> Either ParserError LispVal
-parseLispVal = runParser parseExpr "lisp"
+parseLispVal = runParser (parseExpr <* eof) "singleLispVal"
 
 parseExpr :: Parser LispVal
 parseExpr = parseReserved
@@ -103,10 +103,10 @@ parseReserved = try parseNil <|> (char '#' >>
         parseBool = parseTrue <|> parseFalse
 
         parseTrue :: Parser LispVal
-        parseTrue = char' 't' >> pure (Bool True)
+        parseTrue = char' 't' >> optional (string "rue") >> pure (Bool True)
 
         parseFalse :: Parser LispVal
-        parseFalse = char' 'f' >> pure (Bool False)
+        parseFalse = char' 'f' >> optional (string "alse") >> pure (Bool False)
 
         parseBin :: Parser LispVal
         parseBin = char' 'b' >>

@@ -24,7 +24,6 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 ## Next steps
 
-- Parse more than one expression.
-- Better test #true and #false parsing.  I think I am currently leaving "rue" and "alse" unconsumed.  
-- Fix parsing failure on missing start quote.  This might be "working" but will instead fail on a full program file parse.
 - Get started on evaluation logic.
+- Look at utilizing lexing setup like the V2 tutorial.
+- I think megaparsec and replace most of my number parsing logic, and give floats for free.
