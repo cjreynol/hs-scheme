@@ -26,4 +26,4 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 - Get started on evaluation logic.
 - Look at utilizing lexing setup like the V2 tutorial.
-- I think megaparsec and replace most of my number parsing logic, and give floats for free.
+- I think megaparsec can replace most of my number parsing logic, and give floats for free.

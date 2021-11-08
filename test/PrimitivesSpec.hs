@@ -70,6 +70,6 @@ spec = do
             it "Vector" $ do
                 apply "vector?" [Vector []]
                     `shouldBe` (Bool True)
-            it "Boolean false" $ do
+            it "Vector false" $ do
                 apply "vector?" [Atom "x"]
                     `shouldBe` (Bool False)
