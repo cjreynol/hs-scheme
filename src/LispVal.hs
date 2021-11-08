@@ -11,6 +11,11 @@ License     : MIT
 module LispVal (
       LispVal(..)
     , getNumber
+    , isBoolean
+    , isNull
+    , isNumber
+    , isString
+    , isVector
     , toSchemeString
     ) where
 
@@ -46,3 +51,24 @@ toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")
 getNumber :: LispVal -> Integer
 getNumber (Number n) = n
 getNumber _ = 0
+
+isBoolean :: LispVal -> Bool
+isBoolean (Bool _) = True
+isBoolean _ = False
+
+isString :: LispVal -> Bool
+isString (String _) = True
+isString _ = False
+
+isNumber :: LispVal -> Bool
+isNumber (Number _) = True
+isNumber _ = False
+
+isNull :: LispVal -> Bool
+isNull Nil = True
+isNull (List []) = True
+isNull _ = False
+
+isVector :: LispVal -> Bool
+isVector (Vector _) = True
+isVector _ = False
