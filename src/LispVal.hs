@@ -19,17 +19,20 @@ module LispVal (
     , toSchemeString
     ) where
 
-import Data.Text    as T    (Text, pack, unwords)
+import Data.Text    as T    (Text, unwords)
+
+import Utility              (textShow)
 
 
-data LispVal = Atom Text 
-                | Bool Bool
-                | DottedList [LispVal] LispVal
-                | List [LispVal]
-                | Nil
-                | Number Integer
-                | String Text
-                | Vector [LispVal]
+data LispVal = 
+      Atom Text 
+    | Bool Bool
+    | DottedList [LispVal] LispVal
+    | List [LispVal]
+    | Nil
+    | Number Integer
+    | String Text
+    | Vector [LispVal]
     deriving (Eq, Show)
 
 
@@ -44,7 +47,7 @@ toSchemeString (DottedList lvs lv) = "("
     <> ")"
 toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
 toSchemeString Nil = "Nil"
-toSchemeString (Number n) = pack $ show n
+toSchemeString (Number n) = textShow n
 toSchemeString (String str) = str
 toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
 

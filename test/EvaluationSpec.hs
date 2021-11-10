@@ -23,13 +23,13 @@ spec = do
         describe "Value constants" $ do
             it "Number test" $ do
                 evaluate (Number 1)
-                    `shouldBe` (Number 1)
+                    `shouldBe` Number 1
             it "String test" $ do
                 evaluate (String "xyz")
-                    `shouldBe` (String "xyz")
+                    `shouldBe` String "xyz"
             it "Bool test" $ do
                 evaluate (Bool True)
-                    `shouldBe` (Bool True)
+                    `shouldBe` Bool True
             it "Nil test" $ do
                 evaluate Nil
                     `shouldBe` Nil

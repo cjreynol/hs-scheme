@@ -26,9 +26,9 @@ import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char',
                                     octDigitChar, space1, string)
 import Text.Megaparsec.Char.Lexer   (space, symbol)
 
-import Extra                        (baseToDec, baseToDec)
 import LispVal                      (LispVal(Atom, Bool, DottedList, List, Nil,
                                     Number, String, Vector))
+import Utility                      (baseToDec, textShow)
 
 
 type Parser = Parsec Void Text
@@ -37,7 +37,7 @@ type ParserError = ParseErrorBundle Text Void
 readExpr :: String -> LispVal
 readExpr input = case parseLispVal $ pack input of
     Right val -> val
-    Left err -> String $ "No match:\n" <> (pack . show) err
+    Left err -> String $ "No match:\n" <> textShow err
 
 parseLispVal :: Text -> Either ParserError LispVal
 parseLispVal = runParser (parseExpr <* eof) "expression"
