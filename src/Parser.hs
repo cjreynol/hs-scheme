@@ -15,12 +15,11 @@ module Parser (
 
 import Control.Applicative          (liftA2)
 import Data.Text                    (Text, pack, singleton, unpack)
-import Data.Void                    (Void)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
-                                    between, empty, endBy, eof, lookAhead, many, 
-                                    noneOf, oneOf, optional, runParser, sepBy, 
-                                    sepBy1, some, try)
+                                    between, customFailure, empty, endBy, eof, 
+                                    lookAhead, many, noneOf, oneOf, optional, 
+                                    runParser, sepBy, sepBy1, some, try)
 import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char', 
                                     digitChar, hexDigitChar, letterChar, 
                                     octDigitChar, space1, string)
@@ -33,8 +32,8 @@ import LispVal                      (LispVal(Atom, Bool, DottedList, List, Nil,
 import Utility                      (baseToDec, textShow)
 
 
-type Parser = Parsec Void Text
-type ParserError = ParseErrorBundle Text Void
+type Parser = Parsec Text Text
+type ParserError = ParseErrorBundle Text Text
 
 readExpr :: String -> ThrowsException LispVal
 readExpr input = case parseLispVal $ pack input of
@@ -133,12 +132,12 @@ parseReserved = try parseNil <|> (char '#' >>
             _ <- char '\\'
             first <- alphaNumChar
             rest <- many letterChar
-            pure $ case pack $ first : rest of
-                "newline" -> String "\n"
-                "space" -> String " "
+            case pack $ first : rest of
+                "newline" -> pure $ String "\n"
+                "space" -> pure $ String " "
                 _ -> case rest of 
-                    [] -> String $ singleton first
-                    _ -> error "need to raise a parser error"
+                    [] -> pure $ String $ singleton first
+                    _ -> customFailure $ pack rest
 
 betweenParens :: Parser a -> Parser a
 betweenParens = between (symbolParse "(") (symbolParse ")")
