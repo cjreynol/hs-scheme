@@ -10,7 +10,7 @@ License     : MIT
 
 module LispException (
       LispException(..)
-    , ThrowsError
+    , ThrowsException
     , toExceptionMessage
     ) where
 
@@ -23,13 +23,14 @@ import Utility              (textShow)
 data LispException = 
       NumArgs Integer [LispVal]
     | TypeMismatch Text LispVal
-    | Parser Text
+    | ParsingError Text
     | BadSpecialForm Text LispVal
     | NotFunction Text Text
     | UnboundVar Text Text
     | Default Text
 
-type ThrowsError = Either LispException
+type ThrowsException = Either LispException
+
 
 toExceptionMessage :: LispException -> Text
 toExceptionMessage (NumArgs n args) = 
@@ -38,7 +39,7 @@ toExceptionMessage (NumArgs n args) =
 toExceptionMessage (TypeMismatch expected found) = 
     "Invalid type:  expected - " <> expected 
     <> "\nfound - " <> toSchemeString found
-toExceptionMessage (Parser errorMessage) = "Parse error: " <> errorMessage
+toExceptionMessage (ParsingError errorMessage) = "Parse error: " <> errorMessage
 toExceptionMessage (BadSpecialForm message form) = 
     message <> " - " <> toSchemeString form
 toExceptionMessage (NotFunction message func) = message <> " - " <> func
