@@ -25,44 +25,44 @@ spec = do
         describe "Atom parsing" $ do
             it "Simple example" $ do 
                 parseLispVal "test" 
-                    `shouldBe` Right (Atom "test")
+                    `shouldBe` pure (Atom "test")
 
             it "Boolean true" $ do
                 parseLispVal "#t"
-                    `shouldBe` Right (Bool True)
+                    `shouldBe` pure (Bool True)
 
             it "Boolean true capital" $ do
                 parseLispVal "#T"
-                    `shouldBe` Right (Bool True)
+                    `shouldBe` pure (Bool True)
 
             it "Boolean true word" $ do
                 parseLispVal "#true"
-                    `shouldBe` Right (Bool True)
+                    `shouldBe` pure (Bool True)
 
             it "Boolean false" $ do
                 parseLispVal "#f"
-                    `shouldBe` Right (Bool False)
+                    `shouldBe` pure (Bool False)
 
             it "Boolean false capital" $ do
                 parseLispVal "#F"
-                    `shouldBe` Right (Bool False)
+                    `shouldBe` pure (Bool False)
 
             it "Boolean false word" $ do
                 parseLispVal "#false"
-                    `shouldBe` Right (Bool False)
+                    `shouldBe` pure (Bool False)
 
             it "Quoted atom" $ do
                 parseLispVal "'hello"
-                    `shouldBe` Right (List [Atom "quote", Atom "hello"])
+                    `shouldBe` pure (List [Atom "quote", Atom "hello"])
 
             it "Nil" $ do
                 parseLispVal "Nil"
-                    `shouldBe` Right Nil
+                    `shouldBe` pure Nil
 
         describe "String parsing" $ do
             it "Simple example" $ do
                 parseLispVal "\"hello world\""
-                    `shouldBe` Right (String "hello world")
+                    `shouldBe` pure (String "hello world")
 
             it "End quote missing failure" $ do
                 parseLispVal "\"hello world"
@@ -74,144 +74,144 @@ spec = do
 
             it "Escaped quotes" $ do
                 parseLispVal "\"\\\"hello\\\" world\""
-                    `shouldBe` Right (String "\"hello\" world")
+                    `shouldBe` pure (String "\"hello\" world")
 
             it "Escaped slashes" $ do
                 parseLispVal "\"\\\\hello world\""
-                    `shouldBe` Right (String "\\hello world")
+                    `shouldBe` pure (String "\\hello world")
 
         describe "Escaped characters" $ do
             it "Simple example" $ do
                 parseLispVal "#\\a"
-                    `shouldBe` Right (String "a")
+                    `shouldBe` pure (String "a")
 
             it "Simple example 2" $ do
                 parseLispVal "#\\x"
-                    `shouldBe` Right (String "x")
+                    `shouldBe` pure (String "x")
 
             it "Newline" $ do
                 parseLispVal "#\\newline"
-                    `shouldBe` Right (String "\n")
+                    `shouldBe` pure (String "\n")
 
             it "Space" $ do
                 parseLispVal "#\\space"
-                    `shouldBe` Right (String " ")
+                    `shouldBe` pure (String " ")
 
 
         describe "Number parsing" $ do
             it "Decimal number no prefix" $ do
                 parseLispVal "10"
-                    `shouldBe` Right (Number 10)
+                    `shouldBe` pure (Number 10)
 
             it "Negative decimal number no prefix" $ do
                 parseLispVal "-10"
-                    `shouldBe` Right (Number (-10))
+                    `shouldBe` pure (Number (-10))
 
             it "Positive decimal number no prefix" $ do
                 parseLispVal "+10"
-                    `shouldBe` Right (Number 10)
+                    `shouldBe` pure (Number 10)
 
             it "Hex number" $ do
                 parseLispVal "#x1A"
-                    `shouldBe` Right (Number 26)
+                    `shouldBe` pure (Number 26)
 
             it "Negative hex number" $ do
                 parseLispVal "#x-1A"
-                    `shouldBe` Right (Number (-26))
+                    `shouldBe` pure (Number (-26))
 
             it "Positive hex number" $ do
                 parseLispVal "#x+1A"
-                    `shouldBe` Right (Number 26)
+                    `shouldBe` pure (Number 26)
 
             it "Hex number capital prefix" $ do
                 parseLispVal "#X1A"
-                    `shouldBe` Right (Number 26)
+                    `shouldBe` pure (Number 26)
 
             it "Octal number" $ do
                 parseLispVal "#o14"
-                    `shouldBe` Right (Number 12)
+                    `shouldBe` pure (Number 12)
 
             it "Negative octal number" $ do
                 parseLispVal "#o-14"
-                    `shouldBe` Right (Number (-12))
+                    `shouldBe` pure (Number (-12))
 
             it "Positive octal number" $ do
                 parseLispVal "#o+14"
-                    `shouldBe` Right (Number 12)
+                    `shouldBe` pure (Number 12)
 
             it "Octal number capital prefix" $ do
                 parseLispVal "#O14"
-                    `shouldBe` Right (Number 12)
+                    `shouldBe` pure (Number 12)
 
             it "Binary number" $ do
                 parseLispVal "#b10"
-                    `shouldBe` Right (Number 2)
+                    `shouldBe` pure (Number 2)
 
             it "Negative binary number" $ do
                 parseLispVal "#b-10"
-                    `shouldBe` Right (Number (-2))
+                    `shouldBe` pure (Number (-2))
 
             it "Positive binary number" $ do
                 parseLispVal "#b+10"
-                    `shouldBe` Right (Number 2)
+                    `shouldBe` pure (Number 2)
 
             it "Binary number capital prefix" $ do
                 parseLispVal "#B10"
-                    `shouldBe` Right (Number 2)
+                    `shouldBe` pure (Number 2)
 
             it "Decimal number prefixed" $ do
                 parseLispVal "#d10"
-                    `shouldBe` Right (Number 10)
+                    `shouldBe` pure (Number 10)
 
             it "Negative decimal number prefixed" $ do
                 parseLispVal "#d-10"
-                    `shouldBe` Right (Number (-10))
+                    `shouldBe` pure (Number (-10))
 
             it "Positive decimal number prefixed" $ do
                 parseLispVal "#d+10"
-                    `shouldBe` Right (Number 10)
+                    `shouldBe` pure (Number 10)
 
             it "Decimal number capital prefixed" $ do
                 parseLispVal "#D10"
-                    `shouldBe` Right (Number 10)
+                    `shouldBe` pure (Number 10)
 
         describe "List parsing" $ do
             it "List of single Atom" $ do
                 parseLispVal "(test1)"
-                    `shouldBe` Right (List [Atom "test1"])
+                    `shouldBe` pure (List [Atom "test1"])
 
             it "Empty List" $ do
                 parseLispVal "()"
-                    `shouldBe` Right (List [])
+                    `shouldBe` pure (List [])
 
             it "List of Atoms" $ do
                 parseLispVal "(test1 test2)" 
-                    `shouldBe` Right (List [Atom "test1", Atom "test2"])
+                    `shouldBe` pure (List [Atom "test1", Atom "test2"])
 
             it "List of Lists" $ do
                 parseLispVal "(test1 (test2 (test3)))"
-                    `shouldBe` Right (List [Atom "test1",
+                    `shouldBe` pure (List [Atom "test1",
                                         List [Atom "test2",
                                             List [Atom "test3"]]])
 
         describe "Dotted List parsing" $ do
             it "Dotted list of Atoms" $ do
                 parseLispVal "(test1 . test2)" 
-                    `shouldBe` Right (DottedList [Atom "test1"] 
+                    `shouldBe` pure (DottedList [Atom "test1"] 
                                         (Atom "test2"))
 
         describe "Vector parsing" $ do
             it "Vector of single Atom" $ do
                 parseLispVal "#(test1)"
-                    `shouldBe` Right (Vector [Atom "test1"])
+                    `shouldBe` pure (Vector [Atom "test1"])
 
             it "Vector of Atoms" $ do
                 parseLispVal "#(test1 test2)" 
-                    `shouldBe` Right (Vector [Atom "test1", Atom "test2"])
+                    `shouldBe` pure (Vector [Atom "test1", Atom "test2"])
 
             it "Vector of Vector" $ do
                 parseLispVal "#(test1 #(test2 #(test3)))"
-                    `shouldBe` Right (Vector [Atom "test1",
+                    `shouldBe` pure (Vector [Atom "test1",
                                         Vector [Atom "test2",
                                             Vector [Atom "test3"]]])
 

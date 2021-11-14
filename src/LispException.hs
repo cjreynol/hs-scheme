@@ -28,6 +28,7 @@ data LispException =
     | NotFunction Text Text
     | UnboundVar Text Text
     | Default Text
+    deriving (Eq, Show)
 
 type ThrowsException = Either LispException
 

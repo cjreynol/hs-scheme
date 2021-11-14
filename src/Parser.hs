@@ -14,6 +14,7 @@ module Parser (
     ) where
 
 import Control.Applicative          (liftA2)
+import Control.Monad.Except         (throwError)
 import Data.Text                    (Text, pack, singleton, unpack)
 
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
@@ -37,8 +38,8 @@ type ParserError = ParseErrorBundle Text Text
 
 readExpr :: String -> ThrowsException LispVal
 readExpr input = case parseLispVal $ pack input of
-    Right val -> Right val
-    Left err -> Left $ ParsingError (textShow err)
+    Right val -> pure val
+    Left err -> throwError $ ParsingError (textShow err)
 
 parseLispVal :: Text -> Either ParserError LispVal
 parseLispVal = runParser (parseExpr <* eof) "expression"

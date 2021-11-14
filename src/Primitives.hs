@@ -12,17 +12,22 @@ module Primitives (
     apply
     ) where
 
-import Data.Map as M    (Map, fromList, lookup)
-import Data.Text        (Text)
+import Data.Map as M        (Map, fromList, lookup)
+import Control.Monad.Except (throwError)
+import Data.Text            (Text)
 
-import LispVal          (LispVal(Bool, Number), getNumber, isBoolean, isNull, 
-                        isNumber, isString, isVector)
+import LispException        (LispException(NotFunction, NumArgs), 
+                            ThrowsException)
+import LispVal              (LispVal(Bool, Number), getNumber, isBoolean, 
+                            isNull, isNumber, isString, isVector)
 
 
-apply :: Text -> [LispVal] -> LispVal
-apply func args = maybe (Bool False) ($ args) $ M.lookup func primitives
+apply :: Text -> [LispVal] -> ThrowsException LispVal
+apply funcKey args = case M.lookup funcKey primitives of
+    Just func -> func args 
+    Nothing -> throwError $ NotFunction "Unrecognized function" funcKey
 
-primitives :: Map Text ([LispVal] -> LispVal)
+primitives :: Map Text ([LispVal] -> ThrowsException LispVal)
 primitives = fromList 
   [ ("+", numericBinOpFold (+))
   , ("-", numericBinOpFold (-))
@@ -38,18 +43,16 @@ primitives = fromList
   , ("vector?", booleanUnOp isVector)
   ]
 
-numericBinOp :: (Integer -> Integer -> Integer) -> [LispVal] -> LispVal
-numericBinOp _ [] = error "No arguments provided"
-numericBinOp _ [_] = error "Single argument provided to binary operator"
-numericBinOp op [x, y] = Number $ op (getNumber x) (getNumber y)
-numericBinOp _ _ = error "Too many arguments provided to binary operator"
+numericBinOp :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsException LispVal
+numericBinOp op [x, y] = pure . Number $ op (getNumber x) (getNumber y)
+numericBinOp _ badArgs = throwError $ NumArgs 2 badArgs
 
-numericBinOpFold :: (Integer -> Integer -> Integer) -> [LispVal] -> LispVal
-numericBinOpFold _ [] = error "No arguments provided"
-numericBinOpFold _ [_] = error "Single argument provided to binary operator"
-numericBinOpFold op params = Number $ foldl1 op $ map getNumber params
+numericBinOpFold :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsException LispVal
+numericBinOpFold _ [] = throwError $ NumArgs 2 []
+numericBinOpFold _ badArg@[_] = throwError $ NumArgs 2 badArg
+numericBinOpFold op params = pure . Number $ foldl1 op $ map getNumber params
 
-booleanUnOp :: (LispVal -> Bool) -> [LispVal] -> LispVal
-booleanUnOp _ [] = error "No arguments provided"
-booleanUnOp op [x] = Bool $ op x
-booleanUnOp _ _ = error "Too many arguments provded to unary operator"
+booleanUnOp :: (LispVal -> Bool) -> [LispVal] -> ThrowsException LispVal
+booleanUnOp _ [] = throwError $ NumArgs 1 []
+booleanUnOp op [x] = pure . Bool $ op x
+booleanUnOp _ badArgs = throwError $ NumArgs 1 badArgs

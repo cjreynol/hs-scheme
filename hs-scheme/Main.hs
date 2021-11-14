@@ -20,7 +20,7 @@ import Parser               (readExpr)
 
 main :: IO ()
 main = do
-    expr <- getArgs
-    T.putStrLn $ case readExpr (expr !! 0) of
+    expr <- head <$> getArgs 
+    T.putStrLn $ case readExpr expr >>= evaluate of
         Left exception -> toExceptionMessage exception
-        Right lispVal -> (toSchemeString . evaluate) lispVal
+        Right lispVal -> toSchemeString lispVal
