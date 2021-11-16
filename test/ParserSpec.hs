@@ -199,19 +199,3 @@ spec = do
                 parseLispVal "(test1 . test2)" 
                     `shouldBe` pure (DottedList [Atom "test1"] 
                                         (Atom "test2"))
-
-        describe "Vector parsing" $ do
-            it "Vector of single Atom" $ do
-                parseLispVal "#(test1)"
-                    `shouldBe` pure (Vector [Atom "test1"])
-
-            it "Vector of Atoms" $ do
-                parseLispVal "#(test1 test2)" 
-                    `shouldBe` pure (Vector [Atom "test1", Atom "test2"])
-
-            it "Vector of Vector" $ do
-                parseLispVal "#(test1 #(test2 #(test3)))"
-                    `shouldBe` pure (Vector [Atom "test1",
-                                        Vector [Atom "test2",
-                                            Vector [Atom "test3"]]])
-

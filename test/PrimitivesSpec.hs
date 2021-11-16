@@ -67,9 +67,3 @@ spec = do
             it "String false" $ do
                 apply "string?" [Atom "x"]
                     `shouldBe` pure (Bool False)
-            it "Vector" $ do
-                apply "vector?" [Vector []]
-                    `shouldBe` pure (Bool True)
-            it "Vector false" $ do
-                apply "vector?" [Atom "x"]
-                    `shouldBe` pure (Bool False)

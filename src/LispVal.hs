@@ -15,7 +15,6 @@ module LispVal (
     , isNull
     , isNumber
     , isString
-    , isVector
     , toSchemeString
     ) where
 
@@ -32,7 +31,6 @@ data LispVal =
     | Nil
     | Number Integer
     | String Text
-    | Vector [LispVal]
     deriving (Eq, Show)
 
 
@@ -49,7 +47,6 @@ toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
 toSchemeString Nil = "Nil"
 toSchemeString (Number n) = textShow n
 toSchemeString (String str) = str
-toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
 
 getNumber :: LispVal -> Maybe Integer
 getNumber (Number n) = Just n
@@ -71,7 +68,3 @@ isNull :: LispVal -> Bool
 isNull Nil = True
 isNull (List []) = True
 isNull _ = False
-
-isVector :: LispVal -> Bool
-isVector (Vector _) = True
-isVector _ = False

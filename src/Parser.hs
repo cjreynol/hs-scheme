@@ -20,7 +20,7 @@ import Data.Text                    (Text, pack, singleton, unpack)
 import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
                                     between, customFailure, empty, endBy, eof, 
                                     lookAhead, many, noneOf, oneOf, optional, 
-                                    runParser, sepBy, sepBy1, some, try)
+                                    runParser, sepBy, some, try)
 import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char', 
                                     digitChar, hexDigitChar, letterChar, 
                                     octDigitChar, space1, string)
@@ -29,7 +29,7 @@ import Text.Megaparsec.Char.Lexer   (space, symbol)
 import LispException                (LispException(ParsingError), 
                                     ThrowsException)
 import LispVal                      (LispVal(Atom, Bool, DottedList, List, Nil,
-                                    Number, String, Vector))
+                                    Number, String))
 import Utility                      (baseToDec, textShow)
 
 
@@ -70,9 +70,6 @@ parseDottedList = do
     rest <- char '.' >> space1 >> parseExpr
     pure $ DottedList first rest
 
-parseDataList :: Parser [LispVal]
-parseDataList = sepBy1 parseExpr space1
-
 parseQuoted :: Parser LispVal
 parseQuoted = do
     x <- char '\'' >> parseExpr
@@ -95,7 +92,6 @@ parseReserved = try parseNil <|> (char '#' >>
     <|> parseOct
     <|> parsePrefixedDec
     <|> parseHex
-    <|> parseVector
     <|> parseChar)
     where
         parseNil :: Parser LispVal
@@ -124,9 +120,6 @@ parseReserved = try parseNil <|> (char '#' >>
         parseHex :: Parser LispVal
         parseHex = char' 'x' >>
             Number <$> liftA2 (*) parseSign (parseDigits 16 hexDigitChar)
-
-        parseVector :: Parser LispVal
-        parseVector = Vector <$> betweenParens parseDataList
 
         parseChar :: Parser LispVal
         parseChar = do

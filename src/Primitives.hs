@@ -19,7 +19,7 @@ import Data.Text            (Text)
 import LispException        (LispException(NotFunction, NumArgs, TypeMismatch), 
                             ThrowsException)
 import LispVal              (LispVal(Bool, Number, List), getNumber, isBoolean, 
-                            isNull, isNumber, isString, isVector)
+                            isNull, isNumber, isString)
 
 
 apply :: Text -> [LispVal] -> ThrowsException LispVal
@@ -40,7 +40,6 @@ primitives = fromList
   , ("null?", booleanUnOp isNull)
   , ("number?", booleanUnOp isNumber)
   , ("string?", booleanUnOp isString)
-  , ("vector?", booleanUnOp isVector)
   ]
 
 numericBinOp :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsException LispVal
