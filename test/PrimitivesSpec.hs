@@ -25,8 +25,8 @@ spec = do
                 apply "+" [Number 1, Number 2, Number 3]
                     `shouldBe` pure (Number 6)
             it "Subtraction" $ do
-                apply "-" [Number 1, Number 2, Number 3]
-                    `shouldBe` pure (Number (-4))
+                apply "-" [Number 1, Number 2]
+                    `shouldBe` pure (Number (-1))
             it "Multiplication" $ do
                 apply "*" [Number 1, Number 2, Number 3]
                     `shouldBe` pure (Number 6)

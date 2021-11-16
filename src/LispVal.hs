@@ -51,9 +51,9 @@ toSchemeString (Number n) = textShow n
 toSchemeString (String str) = str
 toSchemeString (Vector lvs) = "#(" <> (T.unwords . map toSchemeString) lvs <> ")"
 
-getNumber :: LispVal -> Integer
-getNumber (Number n) = n
-getNumber _ = 0
+getNumber :: LispVal -> Maybe Integer
+getNumber (Number n) = Just n
+getNumber _ = Nothing
 
 isBoolean :: LispVal -> Bool
 isBoolean (Bool _) = True
