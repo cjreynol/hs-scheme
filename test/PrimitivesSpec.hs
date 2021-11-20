@@ -67,3 +67,83 @@ spec = do
             it "String false" $ do
                 apply "string?" [Atom "x"]
                     `shouldBe` pure (Bool False)
+        describe "Numeric boolean primitives" $ do
+            it "Less than" $ do
+                apply "<" [Number 0, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Less than 2" $ do
+                apply "<" [Number 2, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Less than 3" $ do
+                apply "<" [Number 1, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Greater than" $ do
+                apply ">" [Number 0, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Greater than 2" $ do
+                apply ">" [Number 2, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Greater than 3" $ do
+                apply ">" [Number 1, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Less than or equal" $ do
+                apply "<=" [Number 0, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Less than or equal 2" $ do
+                apply "<=" [Number 2, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Less than or equal 3" $ do
+                apply "<=" [Number 1, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Greater than or equal" $ do
+                apply ">=" [Number 0, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Greater than or equal 2" $ do
+                apply ">=" [Number 2, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Greater than or equal 3" $ do
+                apply ">=" [Number 1, Number 1]
+                    `shouldBe` pure (Bool True)
+            it "Equality" $ do
+                apply "=" [Number 0, Number 0]
+                    `shouldBe` pure (Bool True)
+            it "Equality 2" $ do
+                apply "=" [Number 1, Number 0]
+                    `shouldBe` pure (Bool False)
+            it "Equality 3" $ do
+                apply "=" [Number 0, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "Inequality" $ do
+                apply "/=" [Number 0, Number 0]
+                    `shouldBe` pure (Bool False)
+            it "Inequality 2" $ do
+                apply "/=" [Number 1, Number 0]
+                    `shouldBe` pure (Bool True)
+            it "Inequality 3" $ do
+                apply "/=" [Number 0, Number 1]
+                    `shouldBe` pure (Bool True)
+        describe "Boolean binary primitives" $ do
+            it "boolean and" $ do
+                apply "&&" [Bool True, Bool False]
+                    `shouldBe` pure (Bool False)
+            it "boolean and 2" $ do
+                apply "&&" [Bool True, Bool True]
+                    `shouldBe` pure (Bool True)
+            it "boolean and 3" $ do
+                apply "&&" [Bool False, Bool True]
+                    `shouldBe` pure (Bool False)
+            it "boolean and 4" $ do
+                apply "&&" [Bool False, Bool False]
+                    `shouldBe` pure (Bool False)
+            it "boolean or" $ do
+                apply "||" [Bool True, Bool False]
+                    `shouldBe` pure (Bool True)
+            it "boolean or 2" $ do
+                apply "||" [Bool False, Bool False]
+                    `shouldBe` pure (Bool False)
+            it "boolean or 3" $ do
+                apply "||" [Bool False, Bool True]
+                    `shouldBe` pure (Bool True)
+            it "boolean or 4" $ do
+                apply "||" [Bool True, Bool True]
+                    `shouldBe` pure (Bool True)

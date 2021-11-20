@@ -10,6 +10,7 @@ License     : MIT
 
 module LispVal (
       LispVal(..)
+    , getBoolean
     , getNumber
     , isBoolean
     , isNull
@@ -47,6 +48,10 @@ toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
 toSchemeString Nil = "Nil"
 toSchemeString (Number n) = textShow n
 toSchemeString (String str) = str
+
+getBoolean :: LispVal -> Maybe Bool
+getBoolean (Bool b) = Just b
+getBoolean _ = Nothing
 
 getNumber :: LispVal -> Maybe Integer
 getNumber (Number n) = Just n

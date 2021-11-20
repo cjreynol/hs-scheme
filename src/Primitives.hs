@@ -18,8 +18,8 @@ import Data.Text            (Text)
 
 import LispException        (LispException(NotFunction, NumArgs, TypeMismatch), 
                             ThrowsException)
-import LispVal              (LispVal(Bool, Number, List), getNumber, isBoolean, 
-                            isNull, isNumber, isString)
+import LispVal              (LispVal(Bool, Number, List), getBoolean, getNumber, 
+                            isBoolean, isNull, isNumber, isString)
 
 
 apply :: Text -> [LispVal] -> ThrowsException LispVal
@@ -31,24 +31,49 @@ primitives :: Map Text ([LispVal] -> ThrowsException LispVal)
 primitives = fromList 
   [ ("+", numericBinOpFold (+) 0)
   , ("*", numericBinOpFold (*) 1)
-  , ("-", numericBinOp (-))
-  , ("/", numericBinOp div)
-  , ("mod", numericBinOp mod)
-  , ("quotient", numericBinOp quot)
-  , ("remainder", numericBinOp rem)
+  , ("-", numericNumBinOp (-))
+  , ("/", numericNumBinOp div)
+  , ("mod", numericNumBinOp mod)
+  , ("quotient", numericNumBinOp quot)
+  , ("remainder", numericNumBinOp rem)
   , ("boolean?", booleanUnOp isBoolean)
   , ("null?", booleanUnOp isNull)
   , ("number?", booleanUnOp isNumber)
   , ("string?", booleanUnOp isString)
+  , ("<", numericBoolBinOp (<))
+  , (">", numericBoolBinOp (>))
+  , ("<=", numericBoolBinOp (<=))
+  , (">=", numericBoolBinOp (>=))
+  , ("=", numericBoolBinOp (==))
+  , ("/=", numericBoolBinOp (/=))
+  , ("&&", booleanBinOp (&&))
+  , ("||", booleanBinOp (||))
   ]
 
-numericBinOp :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsException LispVal
-numericBinOp op [x, y] = case (getNumber x, getNumber y) of 
-    (Just x', Just y') -> pure . Number $ op x' y'
-    _ -> throwError $ TypeMismatch "Number" (List [x, y])
-numericBinOp _ badArgs = throwError $ NumArgs 2 badArgs
+binOp :: (LispVal -> Maybe a) -> Text -> (b -> LispVal) 
+    -> (a -> a -> b) -> [LispVal] -> ThrowsException LispVal
+binOp getter typeName constructor op [x, y] = case (getter x, getter y) of 
+    (Just x', Just y') -> pure . constructor $ op x' y'
+    _ -> throwError $ TypeMismatch typeName (List [x, y])
+binOp _ _ _ _ badArgs = throwError $ NumArgs 2 badArgs
 
-numericBinOpFold :: (Integer -> Integer -> Integer) -> Integer -> [LispVal] -> ThrowsException LispVal
+numericBinOp :: (a -> LispVal) -> (Integer -> Integer -> a) -> [LispVal] 
+    -> ThrowsException LispVal
+numericBinOp = binOp getNumber "Number"
+
+numericNumBinOp :: (Integer -> Integer -> Integer) -> [LispVal] 
+    -> ThrowsException LispVal
+numericNumBinOp = numericBinOp Number
+
+numericBoolBinOp :: (Integer -> Integer -> Bool) -> [LispVal] 
+    -> ThrowsException LispVal
+numericBoolBinOp = numericBinOp Bool
+
+booleanBinOp :: (Bool -> Bool -> Bool) -> [LispVal] -> ThrowsException LispVal
+booleanBinOp = binOp getBoolean "Bool" Bool
+
+numericBinOpFold :: (Integer -> Integer -> Integer) -> Integer -> [LispVal] 
+    -> ThrowsException LispVal
 numericBinOpFold _ _ [] = throwError $ NumArgs 2 []
 numericBinOpFold _ _ badArg@[_] = throwError $ NumArgs 2 badArg
 numericBinOpFold op ident params = helper ident $ map getNumber params
