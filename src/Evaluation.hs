@@ -25,6 +25,15 @@ evaluate val@(Bool _) = pure val
 evaluate val@(Number _) = pure val
 evaluate Nil = pure Nil
 evaluate (List [Atom "quote", val]) = pure val
+evaluate (List [Atom "if", predicate, conseq, alt]) = do
+    result <- evaluate predicate
+    case result of
+      Bool True -> evaluate conseq
+      Bool False -> evaluate alt
+      _ -> throwError $ 
+        BadSpecialForm "if predicate must evaluate to boolean" predicate
+evaluate badForm@(List [Atom "if", _]) = throwError $ 
+    BadSpecialForm "if <bool> <s-expr> <s-expr>" badForm
 evaluate (List (Atom func : args)) = mapM evaluate args >>= apply func
 evaluate badForm = throwError $ 
-  BadSpecialForm "Unrecognized special form" badForm
+    BadSpecialForm "Unrecognized special form" badForm
