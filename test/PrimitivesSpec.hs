@@ -147,3 +147,13 @@ spec = do
             it "boolean or 4" $ do
                 apply "||" [Bool True, Bool True]
                     `shouldBe` pure (Bool True)
+        describe "List primitives" $ do
+            it "car list" $ do
+                apply "car" [List [Atom "x", Atom "y"]]
+                    `shouldBe` pure (Atom "x")
+            it "cdr list" $ do
+                apply "cdr" [List [Atom "x", Atom "y"]]
+                    `shouldBe` pure (List [Atom "y"])
+            it "cons list" $ do
+                apply "cons" [Atom "x", Atom "y"]
+                    `shouldBe` pure (DottedList [Atom "x"] (Atom "y"))

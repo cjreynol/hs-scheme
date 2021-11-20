@@ -18,8 +18,9 @@ import Data.Text            (Text)
 
 import LispException        (LispException(NotFunction, NumArgs, TypeMismatch), 
                             ThrowsException)
-import LispVal              (LispVal(Bool, Number, List), getBoolean, getNumber, 
-                            isBoolean, isNull, isNumber, isString)
+import LispVal              (LispVal(Bool, DottedList, Number, List), 
+                            getBoolean, getNumber, isBoolean, isNull, isNumber, 
+                            isString)
 
 
 apply :: Text -> [LispVal] -> ThrowsException LispVal
@@ -48,6 +49,9 @@ primitives = fromList
   , ("/=", numericBoolBinOp (/=))
   , ("&&", booleanBinOp (&&))
   , ("||", booleanBinOp (||))
+  , ("car", car)
+  , ("cdr", cdr)
+  , ("cons", cons)
   ]
 
 binOp :: (LispVal -> Maybe a) -> Text -> (b -> LispVal) 
@@ -87,3 +91,23 @@ booleanUnOp :: (LispVal -> Bool) -> [LispVal] -> ThrowsException LispVal
 booleanUnOp _ [] = throwError $ NumArgs 1 []
 booleanUnOp op [x] = pure . Bool $ op x
 booleanUnOp _ badArgs = throwError $ NumArgs 1 badArgs
+
+car :: [LispVal] -> ThrowsException LispVal
+car [List (x : _)] = pure x
+car [DottedList (x : _) _] = pure x
+car [badArg] = throwError $ TypeMismatch "<pair>" badArg
+car badArgList = throwError $ NumArgs 1 badArgList
+
+cdr :: [LispVal] -> ThrowsException LispVal
+cdr [List (_ : xs)] = pure $ List xs
+cdr [DottedList [_] x] = pure x
+cdr [DottedList (_ : xs) x] = pure $ DottedList xs x
+cdr [badArg] = throwError $ TypeMismatch "<pair>" badArg
+cdr badArgList = throwError $ NumArgs 1 badArgList
+
+cons :: [LispVal] -> ThrowsException LispVal
+cons [x, List []] = pure $ List [x]
+cons [x, List xs] = pure $ List (x : xs)
+cons [x, DottedList xs xLast] = pure $ DottedList (x : xs) xLast
+cons [x, y] = pure $ DottedList [x] y
+cons badArgList = throwError $ NumArgs 2 badArgList
