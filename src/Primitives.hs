@@ -18,9 +18,9 @@ import Data.Text            (Text)
 
 import LispException        (LispException(NotFunction, NumArgs, TypeMismatch), 
                             ThrowsException)
-import LispVal              (LispVal(Bool, DottedList, Number, List), 
-                            getBoolean, getNumber, isBoolean, isNull, isNumber, 
-                            isString)
+import LispVal              (LispVal(Atom, Bool, DottedList, List, Number, 
+                            String), getBoolean, getNumber, isBoolean, isNull, 
+                            isNumber, isString)
 
 
 apply :: Text -> [LispVal] -> ThrowsException LispVal
@@ -52,6 +52,7 @@ primitives = fromList
   , ("car", car)
   , ("cdr", cdr)
   , ("cons", cons)
+  , ("eqv?", eqv)
   ]
 
 binOp :: (LispVal -> Maybe a) -> Text -> (b -> LispVal) 
@@ -111,3 +112,20 @@ cons [x, List xs] = pure $ List (x : xs)
 cons [x, DottedList xs xLast] = pure $ DottedList (x : xs) xLast
 cons [x, y] = pure $ DottedList [x] y
 cons badArgList = throwError $ NumArgs 2 badArgList
+
+eqv :: [LispVal] -> ThrowsException LispVal
+eqv [Bool x, Bool y] = pure . Bool $ x == y
+eqv [Number x, Number y] = pure . Bool $ x == y
+eqv [String x, String y] = pure . Bool $ x == y
+eqv [Atom x, Atom y] = pure . Bool $ x == y
+eqv [DottedList xs x, DottedList ys y] = 
+    eqv [List $ xs <> [x], List $ ys <> [y]]
+eqv [List xs, List ys] = pure . Bool $ length xs == length ys 
+    && all (== True) (zipWith helper xs ys)
+    where
+        helper :: LispVal -> LispVal -> Bool
+        helper a b = case eqv [a, b] of
+            Right (Bool bool) -> bool
+            _ -> False
+eqv [_, _] = pure $ Bool False
+eqv badArgList = throwError $ NumArgs 2 badArgList

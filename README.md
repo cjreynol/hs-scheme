@@ -24,7 +24,6 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 ## Next steps
 
-- Expand number of primitives:  equality.
 - Expand number of test cases, test more error cases especially.
 - Look at utilizing lexing setup like the V2 tutorial.
 - I think megaparsec can replace most of my number parsing logic, and give floats for free.

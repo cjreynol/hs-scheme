@@ -157,3 +157,34 @@ spec = do
             it "cons list" $ do
                 apply "cons" [Atom "x", Atom "y"]
                     `shouldBe` pure (DottedList [Atom "x"] (Atom "y"))
+        describe "Equality primitives" $ do
+            it "eqv? Bool" $ do
+                apply "eqv?" [Bool True, Bool True]
+                    `shouldBe` pure (Bool True)
+            it "eqv? Bool 2" $ do
+                apply "eqv?" [Bool True, Bool False]
+                    `shouldBe` pure (Bool False)
+            it "eqv? Number" $ do
+                apply "eqv?" [Number 0, Number 0]
+                    `shouldBe` pure (Bool True)
+            it "eqv? Number 2" $ do
+                apply "eqv?" [Number 0, Number 1]
+                    `shouldBe` pure (Bool False)
+            it "eqv? String" $ do
+                apply "eqv?" [String "a", String "a"]
+                    `shouldBe` pure (Bool True)
+            it "eqv? String 2" $ do
+                apply "eqv?" [String "a", String "b"]
+                    `shouldBe` pure (Bool False)
+            it "eqv? Atom" $ do
+                apply "eqv?" [Atom "a", Atom "a"]
+                    `shouldBe` pure (Bool True)
+            it "eqv? Atom 2" $ do
+                apply "eqv?" [Atom "a", Atom "b"]
+                    `shouldBe` pure (Bool False)
+            it "eqv? List" $ do
+                apply "eqv?" [List [Atom "a"], List [Atom "a"]]
+                    `shouldBe` pure (Bool True)
+            it "eqv? List 2" $ do
+                apply "eqv?" [List [Atom "a"], List [Atom "b"]]
+                    `shouldBe` pure (Bool False)
