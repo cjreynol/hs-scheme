@@ -23,7 +23,7 @@ import Text.Megaparsec                  (Parsec, ParseErrorBundle, eof, noneOf,
 import Text.Megaparsec.Char             (alphaNumChar, char, char', letterChar, 
                                         space1, string)
 import Text.Megaparsec.Char.Lexer       (binary, decimal, hexadecimal, octal, 
-                                        signed, space, symbol)
+                                        signed, space)
 
 import LispException                    (LispException(ParsingError), 
                                         ThrowsException)
@@ -34,8 +34,8 @@ import LispVal                          (LispVal(Atom, Bool, DottedList, List,
 type Parser = Parsec Text Text
 type ParserError = ParseErrorBundle Text Text
 
-readExpr :: String -> ThrowsException LispVal
-readExpr input = case parseLispVal $ pack input of
+readExpr :: Text -> ThrowsException LispVal
+readExpr input = case parseLispVal input of
     Right val -> pure val
     Left err -> throwError $ ParsingError $ (pack . show) err
 
@@ -48,7 +48,7 @@ parseExpr = parseReserved
     <|> parseAtom
     <|> parseString
     <|> parseQuoted
-    <|> betweenParens (try parseList <|> parseDottedList)
+    <|> between (char '(') (char ')') (try parseList <|> parseDottedList)
 
 parseAtom :: Parser LispVal
 parseAtom = do
@@ -74,7 +74,7 @@ parseQuoted = do
     pure $ List [Atom "quote", x]
 
 parseString :: Parser LispVal
-parseString = String . pack <$> betweenDQuotes
+parseString = String . pack <$> between (char '\"') (char '\"')
         (many $ noneOf escapedChars <|> (char '\\' >> oneOf escapedChars))
     where
         escapedChars :: String
@@ -127,15 +127,6 @@ parseReserved = try parseNil <|> (char '#' >>
                 _ -> case rest of 
                     [] -> pure $ String $ singleton first
                     _ -> fail rest
-
-betweenParens :: Parser a -> Parser a
-betweenParens = between (symbolParse "(") (symbolParse ")")
-
-betweenDQuotes :: Parser a -> Parser a
-betweenDQuotes = between (symbolParse "\"") (symbolParse "\"")
-
-symbolParse :: Text -> Parser Text
-symbolParse = symbol spaceConsumer
 
 spaceConsumer :: Parser ()
 spaceConsumer = space space1 empty empty

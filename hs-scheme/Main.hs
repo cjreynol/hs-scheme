@@ -9,6 +9,7 @@ module Main (
     main
     ) where
 
+import Data.Text            (pack)
 import Data.Text.IO as T    (putStrLn)
 import System.Environment   (getArgs)
 
@@ -20,7 +21,7 @@ import Parser               (readExpr)
 
 main :: IO ()
 main = do
-    expr <- head <$> getArgs 
+    expr <- pack . head <$> getArgs 
     T.putStrLn $ case readExpr expr >>= evaluate of
         Left exception -> toExceptionMessage exception
         Right lispVal -> toSchemeString lispVal
