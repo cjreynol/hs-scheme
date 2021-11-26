@@ -18,7 +18,7 @@ recent features of either of those tools or the dependent libraries and should
 be backwards compatible beyond the bounds listed in the .cabal file.  
 
 - To build the entire project:  `cabal build`
-- To run the main CLI application:  `cabal run`
+- To run the main CLI application:  `cabal run hs-scheme`
 - To run the test suite:  `cabal test`
 
 
@@ -26,6 +26,5 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 - Expand number of test cases, test more error cases especially.
 - Remaining language functionality to support lambdas/defines/local evaluation context.
-- Build a REPL.
 - File I/O with Ports.
 - Run scheme standard library scheme code and test that they are working as expected.

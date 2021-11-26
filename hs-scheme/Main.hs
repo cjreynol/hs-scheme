@@ -16,8 +16,7 @@ import System.Environment   (getArgs)
 import System.IO            (hFlush, stdout)
 
 import Evaluation           (evaluate)
-import LispException        (toExceptionMessage)
-import LispVal              (toSchemeString)
+import LispException        (showLispOutput)
 import Parser               (readExpr)
 
 
@@ -36,12 +35,23 @@ runRepl = do
     input <- T.getLine
     case input of
         ":quit" -> T.putStrLn "exit" >> pure ()
+        ":debug" -> runDebugRepl
         _ -> (T.putStrLn . process) input >> runRepl
+
+runDebugRepl :: IO ()
+runDebugRepl = do
+    T.putStr "hs-scheme(debug)>>> "
+    hFlush stdout
+    input <- T.getLine
+    case input of
+        ":quit" -> T.putStrLn "exit" >> pure ()
+        _ -> (T.putStrLn . debugParse) input >> runRepl
 
 runEvaluator :: String -> IO ()
 runEvaluator = T.putStrLn . process . pack
 
 process :: Text -> Text
-process expr = case readExpr expr >>= evaluate of
-        Left exception -> toExceptionMessage exception
-        Right lispVal -> toSchemeString lispVal
+process expr = showLispOutput $ readExpr expr >>= evaluate
+
+debugParse :: Text -> Text
+debugParse = showLispOutput . readExpr

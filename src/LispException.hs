@@ -9,7 +9,7 @@ License     : MIT
 module LispException (
       LispException(..)
     , ThrowsException
-    , toExceptionMessage
+    , showLispOutput
     ) where
 
 import Data.Text    as T    (Text, pack, unwords)
@@ -43,3 +43,7 @@ toExceptionMessage (BadSpecialForm message form) =
 toExceptionMessage (NotFunction message func) = message <> " - " <> func
 toExceptionMessage (UnboundVar message varName) = message <> " - " <> varName
 toExceptionMessage (Default message) = message
+
+showLispOutput :: ThrowsException LispVal -> Text
+showLispOutput (Left exception) = toExceptionMessage exception
+showLispOutput (Right value) = toSchemeString value

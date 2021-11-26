@@ -32,6 +32,6 @@ evaluate (List [Atom "if", predicate, conseq, alt]) = do
         BadSpecialForm "if predicate must evaluate to boolean" predicate
 evaluate badForm@(List [Atom "if", _]) = throwError $ 
     BadSpecialForm "if <bool> <s-expr> <s-expr>" badForm
-evaluate (List (Atom func : args)) = mapM evaluate args >>= apply func
+evaluate (List (Atom func : args)) = traverse evaluate args >>= apply func
 evaluate badForm = throwError $ 
     BadSpecialForm "Unrecognized special form" badForm
