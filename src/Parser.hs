@@ -84,13 +84,13 @@ parseDec :: Parser LispVal
 parseDec = Number <$> parseSigned decimal
 
 parseReserved :: Parser LispVal
-parseReserved = try parseNil <|> (char '#' >>
-    parseBool
-    <|> parseBin
-    <|> parseOct
-    <|> parsePrefixedDec
-    <|> parseHex
-    <|> parseChar)
+parseReserved = try parseNil 
+    <|> (char '#' >> parseBool
+        <|> parseBin
+        <|> parseOct
+        <|> parsePrefixedDec
+        <|> parseHex
+        <|> parseChar)
     where
         parseNil :: Parser LispVal
         parseNil = string "Nil" >> pure Nil
@@ -128,8 +128,8 @@ parseReserved = try parseNil <|> (char '#' >>
                     [] -> pure $ String $ singleton first
                     _ -> fail rest
 
-spaceConsumer :: Parser ()
-spaceConsumer = space space1 empty empty
-
 parseSigned :: Parser Integer -> Parser Integer
 parseSigned = signed spaceConsumer
+    where
+    spaceConsumer :: Parser ()
+    spaceConsumer = space space1 empty empty
