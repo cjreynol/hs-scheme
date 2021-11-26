@@ -11,8 +11,9 @@ module Main (
     ) where
 
 import Data.Text            (Text, pack)
-import Data.Text.IO as T    (putStrLn)
+import Data.Text.IO as T    (getLine, putStr, putStrLn)
 import System.Environment   (getArgs)
+import System.IO            (hFlush, stdout)
 
 import Evaluation           (evaluate)
 import LispException        (toExceptionMessage)
@@ -29,10 +30,13 @@ main = do
         _ -> T.putStrLn "0 or 1 arguments expected."
 
 runRepl :: IO ()
-runRepl = undefined
-    where
-        isQuit :: Text -> Bool
-        isQuit = (==) "quit"
+runRepl = do
+    T.putStr "hs-scheme>>> "
+    hFlush stdout
+    input <- T.getLine
+    case input of
+        ":quit" -> T.putStrLn "exit" >> pure ()
+        _ -> (T.putStrLn . process) input >> runRepl
 
 runEvaluator :: String -> IO ()
 runEvaluator = T.putStrLn . process . pack
