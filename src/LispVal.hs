@@ -6,8 +6,6 @@ License     : MIT
 -}
 
 
-{-# LANGUAGE OverloadedStrings #-}
-
 module LispVal (
       LispVal(..)
     , getBoolean

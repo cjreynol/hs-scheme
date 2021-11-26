@@ -25,7 +25,6 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 ## Next steps
 
 - Expand number of test cases, test more error cases especially.
-- Look at utilizing lexing setup like the V2 tutorial.
 - Remaining language functionality to support lambdas/defines/local evaluation context.
 - Build a REPL.
 - File I/O with Ports.

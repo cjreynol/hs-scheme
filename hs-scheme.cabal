@@ -27,7 +27,8 @@ executable hs-scheme
                         , hs-scheme-lib
     -- other-modules:
     hs-source-dirs:     hs-scheme
-    -- other-extensions:
+    default-extensions: OverloadedStrings
+    -- other-extensions:   
     default-language:   Haskell2010
     ghc-options:        -Wall 
                         -Wcompat 
@@ -49,7 +50,8 @@ library hs-scheme-lib
                         , Primitives
     -- other-modules:      
     hs-source-dirs:     src
-    -- other-extensions
+    default-extensions: OverloadedStrings
+    -- other-extensions:   
     default-language:   Haskell2010
     ghc-options:        -Wall 
                         -Wcompat 
@@ -67,7 +69,8 @@ test-suite spec
                         , ParserSpec
                         , PrimitivesSpec
     hs-source-dirs:     test
-    -- other-extensions:
+    default-extensions: OverloadedStrings
+    -- other-extensions:   
     default-language:   Haskell2010
     ghc-options:        -Wall
     build-tool-depends: hspec-discover:hspec-discover == 2.*
