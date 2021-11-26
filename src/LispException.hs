@@ -14,10 +14,9 @@ module LispException (
     , toExceptionMessage
     ) where
 
-import Data.Text    as T    (Text, unwords)
+import Data.Text    as T    (Text, pack, unwords)
 
 import LispVal              (LispVal, toSchemeString)
-import Utility              (textShow)
 
 
 data LispException = 
@@ -35,7 +34,7 @@ type ThrowsException = Either LispException
 
 toExceptionMessage :: LispException -> Text
 toExceptionMessage (NumArgs n args) = 
-    "Expected - " <> textShow n <> "args.  "
+    "Expected - " <> (pack . show) n <> "args.  "
     <> "Found - " <> T.unwords (map toSchemeString args)
 toExceptionMessage (TypeMismatch expected found) = 
     "Invalid type:  expected - " <> expected 

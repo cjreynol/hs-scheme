@@ -19,9 +19,7 @@ module LispVal (
     , toSchemeString
     ) where
 
-import Data.Text    as T    (Text, unwords)
-
-import Utility              (textShow)
+import Data.Text    as T    (Text, pack, unwords)
 
 
 data LispVal = 
@@ -46,7 +44,7 @@ toSchemeString (DottedList lvs lv) = "("
     <> ")"
 toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
 toSchemeString Nil = "Nil"
-toSchemeString (Number n) = textShow n
+toSchemeString (Number n) = (pack . show) n
 toSchemeString (String str) = str
 
 getBoolean :: LispVal -> Maybe Bool

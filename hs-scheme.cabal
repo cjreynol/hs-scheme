@@ -36,17 +36,18 @@ executable hs-scheme
                         -Wmissing-import-lists
 
 library hs-scheme-lib
-    build-depends:        base          ^>= 4.14.0
-                        , containers    ^>= 0.6.5
-                        , megaparsec    >=  9.0.1
-                        , mtl           >=  2.2.2
-                        , text          ^>= 1.2.4
+    build-depends:        base                  ^>= 4.14.0
+                        , containers            ^>= 0.6.5
+                        , megaparsec            ^>= 9.2.0
+                        , mtl                   ^>= 2.2.2
+                        , parser-combinators    ^>= 1.3
+                        , text                  ^>= 1.2.4
     exposed-modules:      Evaluation
                         , LispException
                         , LispVal
                         , Parser
                         , Primitives
-    other-modules:        Utility
+    -- other-modules:      
     hs-source-dirs:     src
     -- other-extensions
     default-language:   Haskell2010
@@ -60,7 +61,7 @@ test-suite spec
     type:               exitcode-stdio-1.0
     main-is:            Spec.hs
     build-depends:        base          ^>= 4.14.0
-                        , hspec         >=  2.7.4
+                        , hspec         >=  2.9.2
                         , hs-scheme-lib
     other-modules:        EvaluationSpec
                         , ParserSpec

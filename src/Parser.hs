@@ -13,24 +13,22 @@ module Parser (
     , readExpr
     ) where
 
-import Control.Applicative          (liftA2)
-import Control.Monad.Except         (throwError)
-import Data.Text                    (Text, pack, singleton, unpack)
+import Control.Applicative              ((<|>), empty, many, optional)
+import Control.Applicative.Combinators  (between, endBy, sepBy)
+import Control.Monad.Except             (throwError)
+import Data.Text                        (Text, pack, singleton, unpack)
 
-import Text.Megaparsec              (Parsec, ParseErrorBundle, (<|>), anySingle,
-                                    between, customFailure, empty, endBy, eof, 
-                                    lookAhead, many, noneOf, oneOf, optional, 
-                                    runParser, sepBy, some, try)
-import Text.Megaparsec.Char         (alphaNumChar, binDigitChar, char, char', 
-                                    digitChar, hexDigitChar, letterChar, 
-                                    octDigitChar, space1, string)
-import Text.Megaparsec.Char.Lexer   (space, symbol)
+import Text.Megaparsec                  (Parsec, ParseErrorBundle, eof, noneOf, 
+                                        oneOf, runParser, try)
+import Text.Megaparsec.Char             (alphaNumChar, char, char', letterChar, 
+                                        space1, string)
+import Text.Megaparsec.Char.Lexer       (binary, decimal, hexadecimal, octal, 
+                                        signed, space, symbol)
 
-import LispException                (LispException(ParsingError), 
-                                    ThrowsException)
-import LispVal                      (LispVal(Atom, Bool, DottedList, List, Nil,
-                                    Number, String))
-import Utility                      (baseToDec, textShow)
+import LispException                    (LispException(ParsingError), 
+                                        ThrowsException)
+import LispVal                          (LispVal(Atom, Bool, DottedList, List, 
+                                        Nil, Number, String))
 
 
 type Parser = Parsec Text Text
@@ -39,7 +37,7 @@ type ParserError = ParseErrorBundle Text Text
 readExpr :: String -> ThrowsException LispVal
 readExpr input = case parseLispVal $ pack input of
     Right val -> pure val
-    Left err -> throwError $ ParsingError (textShow err)
+    Left err -> throwError $ ParsingError $ (pack . show) err
 
 parseLispVal :: Text -> Either ParserError LispVal
 parseLispVal = runParser (parseExpr <* eof) "expression"
@@ -83,7 +81,7 @@ parseString = String . pack <$> betweenDQuotes
         escapedChars = "\"\\"
 
 parseDec :: Parser LispVal
-parseDec = Number <$> liftA2 (*) parseSign (parseDigits 10 digitChar)
+parseDec = Number <$> parseSigned decimal
 
 parseReserved :: Parser LispVal
 parseReserved = try parseNil <|> (char '#' >>
@@ -107,19 +105,16 @@ parseReserved = try parseNil <|> (char '#' >>
         parseFalse = char' 'f' >> optional (string "alse") >> pure (Bool False)
 
         parseBin :: Parser LispVal
-        parseBin = char' 'b' >>
-            Number <$> liftA2 (*) parseSign (parseDigits 2 binDigitChar)
+        parseBin = char' 'b' >> Number <$> parseSigned binary
 
         parsePrefixedDec :: Parser LispVal
         parsePrefixedDec = char' 'd' >> parseDec
 
         parseOct :: Parser LispVal
-        parseOct = char' 'o' >>
-            Number <$> liftA2 (*) parseSign (parseDigits 8 octDigitChar)
+        parseOct = char' 'o' >> Number <$> parseSigned octal
 
         parseHex :: Parser LispVal
-        parseHex = char' 'x' >>
-            Number <$> liftA2 (*) parseSign (parseDigits 16 hexDigitChar)
+        parseHex = char' 'x' >> Number <$> parseSigned hexadecimal
 
         parseChar :: Parser LispVal
         parseChar = do
@@ -131,7 +126,7 @@ parseReserved = try parseNil <|> (char '#' >>
                 "space" -> pure $ String " "
                 _ -> case rest of 
                     [] -> pure $ String $ singleton first
-                    _ -> customFailure $ pack rest
+                    _ -> fail rest
 
 betweenParens :: Parser a -> Parser a
 betweenParens = between (symbolParse "(") (symbolParse ")")
@@ -145,13 +140,5 @@ symbolParse = symbol spaceConsumer
 spaceConsumer :: Parser ()
 spaceConsumer = space space1 empty empty
 
-parseDigits :: Int -> Parser Char -> Parser Integer
-parseDigits base charSetParser = baseToDec base <$> some charSetParser
-
-parseSign :: Parser Integer
-parseSign = do
-    nextChar <- lookAhead anySingle
-    case nextChar of
-        '-' -> char '-' >> pure (-1)
-        '+' -> char '+' >> pure 1
-        _ -> pure 1
+parseSigned :: Parser Integer -> Parser Integer
+parseSigned = signed spaceConsumer
