@@ -24,34 +24,31 @@ main :: IO ()
 main = do
     args <- getArgs
     case length args of
-        0 -> runRepl
+        0 -> runEvalRepl
         1 -> runEvaluator $ head args
         _ -> T.putStrLn "0 or 1 arguments expected."
-
-runRepl :: IO ()
-runRepl = do
-    T.putStr "hs-scheme>>> "
-    hFlush stdout
-    input <- T.getLine
-    case input of
-        ":quit" -> T.putStrLn "exit" >> pure ()
-        ":debug" -> runDebugRepl
-        _ -> (T.putStrLn . process) input >> runRepl
-
-runDebugRepl :: IO ()
-runDebugRepl = do
-    T.putStr "hs-scheme(debug)>>> "
-    hFlush stdout
-    input <- T.getLine
-    case input of
-        ":quit" -> T.putStrLn "exit" >> pure ()
-        _ -> (T.putStrLn . debugParse) input >> runRepl
 
 runEvaluator :: String -> IO ()
 runEvaluator = T.putStrLn . process . pack
 
-process :: Text -> Text
-process expr = showLispOutput $ readExpr expr >>= evaluate
+runEvalRepl :: IO ()
+runEvalRepl = runReplGen "(eval)" runEvalRepl runParseRepl process
+
+runParseRepl :: IO ()
+runParseRepl = runReplGen "(parse)" runParseRepl runEvalRepl debugParse
+
+runReplGen :: Text -> IO () -> IO () -> (Text -> Text) -> IO ()
+runReplGen prompt thisRepl otherRepl processorFunc = do
+    T.putStr $ "hs-scheme" <> prompt <> ">>> "
+    hFlush stdout
+    input <- T.getLine
+    case input of
+        ":quit" -> T.putStrLn "exit" >> pure ()
+        ":swap" -> otherRepl
+        _ -> (T.putStrLn . processorFunc) input >> thisRepl
 
 debugParse :: Text -> Text
 debugParse = showLispOutput . readExpr
+
+process :: Text -> Text
+process expr = showLispOutput $ readExpr expr >>= evaluate

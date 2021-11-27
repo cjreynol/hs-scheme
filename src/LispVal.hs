@@ -43,7 +43,7 @@ toSchemeString (DottedList lvs lv) = "("
 toSchemeString (List lvs) = "(" <> (T.unwords . map toSchemeString) lvs <> ")"
 toSchemeString Nil = "Nil"
 toSchemeString (Number n) = (pack . show) n
-toSchemeString (String str) = str
+toSchemeString (String str) = "\"" <> str <> "\""
 
 getBoolean :: LispVal -> Maybe Bool
 getBoolean (Bool b) = Just b
