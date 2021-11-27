@@ -11,7 +11,7 @@ module Parser (
     , readExpr
     ) where
 
-import Control.Applicative              ((<|>), empty, many, optional)
+import Control.Applicative              ((<|>), many, optional)
 import Control.Applicative.Combinators  (between, endBy, sepBy)
 import Control.Monad.Except             (throwError)
 import Data.Text                        (Text, pack, singleton, unpack)
@@ -21,7 +21,7 @@ import Text.Megaparsec                  (Parsec, ParseErrorBundle, eof, noneOf,
 import Text.Megaparsec.Char             (alphaNumChar, char, char', letterChar, 
                                         space1, string)
 import Text.Megaparsec.Char.Lexer       (binary, decimal, hexadecimal, octal, 
-                                        signed, space)
+                                        signed)
 
 import LispException                    (LispException(ParsingError), 
                                         ThrowsException)
@@ -42,7 +42,7 @@ parseLispVal = runParser (parseExpr <* eof) "expression"
 
 parseExpr :: Parser LispVal
 parseExpr = parseReserved
-    <|> parseDec
+    <|> try parseDec
     <|> parseAtom
     <|> parseString
     <|> parseQuoted
@@ -127,7 +127,4 @@ parseReserved = try parseNil
                     _ -> fail rest
 
 parseSigned :: Parser Integer -> Parser Integer
-parseSigned = signed spaceConsumer
-    where
-    spaceConsumer :: Parser ()
-    spaceConsumer = space space1 empty empty
+parseSigned = signed $ pure ()
