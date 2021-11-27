@@ -10,7 +10,8 @@ module PrimitivesSpec (
     spec
     ) where
 
-import Test.Hspec   (Spec, describe, it, shouldBe)
+import Data.Either  (isLeft)
+import Test.Hspec   (Spec, describe, it, shouldBe, shouldSatisfy)
 
 import LispVal      (LispVal(..))
 import Primitives   (apply)
@@ -186,6 +187,14 @@ spec = do
                 apply "||" [Bool True, Bool True]
                     `shouldBe` pure (Bool True)
 
+            it "boolean and no args failure" $ do
+                apply "&&" []
+                    `shouldSatisfy` isLeft
+
+            it "boolean and one arg failure" $ do
+                apply "&&" [Bool True]
+                    `shouldSatisfy` isLeft
+
         describe "List primitives" $ do
             it "car list" $ do
                 apply "car" [List [Atom "x", Atom "y"]]
@@ -239,3 +248,11 @@ spec = do
             it "eqv? List 2" $ do
                 apply "eqv?" [List [Atom "a"], List [Atom "b"]]
                     `shouldBe` pure (Bool False)
+            
+            it "eqv? no args fails" $ do
+                apply "eqv?" []
+                    `shouldSatisfy` isLeft
+            
+            it "eqv? one arg fails" $ do
+                apply "eqv?" [Atom "a"]
+                    `shouldSatisfy` isLeft

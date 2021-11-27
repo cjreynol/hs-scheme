@@ -24,7 +24,6 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 ## Next steps
 
-- Expand number of test cases, test more error cases especially.
 - Remaining language functionality to support lambdas/defines/local evaluation context.
 - File I/O with Ports.
 - Run scheme standard library scheme code and test that they are working as expected.

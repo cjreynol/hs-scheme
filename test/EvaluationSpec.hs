@@ -10,7 +10,8 @@ module EvaluationSpec (
     spec
     ) where
 
-import Test.Hspec   (Spec, describe, it, shouldBe)
+import Data.Either  (isLeft)
+import Test.Hspec   (Spec, describe, it, shouldBe, shouldSatisfy)
 
 import Evaluation   (evaluate)
 import LispVal      (LispVal(..))
@@ -61,12 +62,21 @@ spec = do
                 it "Multiplication" $ do
                     evaluate (List [Atom "*", Number 1, Number 2])
                         `shouldBe` pure (Number 2)
+                
+            describe "Non-function failure" $ do
+                it "Number head of list" $ do
+                    evaluate (List [Number 1, Number 2, Number 3])
+                        `shouldSatisfy` isLeft
 
             describe "List tests" $ do
                 it "car" $ do
-                    evaluate (List [Atom "car", List [Number 1, Number 2]])
+                    evaluate (List [Atom "car", 
+                        List [Atom "quote", 
+                            List [Number 1, Number 2]]])
                         `shouldBe` pure (Number 1)
 
                 it "cdr" $ do
-                    evaluate (List [Atom "cdr", List [Number 1, Number 2, Number 3]])
+                    evaluate (List [Atom "cdr", 
+                        List [Atom "quote", 
+                            List [Number 1, Number 2, Number 3]]])
                         `shouldBe` pure (List [Number 2, Number 3])
