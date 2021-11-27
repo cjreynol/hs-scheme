@@ -191,6 +191,29 @@ spec = do
                     `shouldBe` pure (List [Atom "test1",
                                         List [Atom "test2",
                                             List [Atom "test3"]]])
+            it "List of mixed type" $ do
+                parseLispVal "(test1 123 \"hello\")"
+                    `shouldBe` pure (List 
+                        [Atom "test1", Number 123, String "hello"])
+
+        describe "Function applications" $ do
+            it "List of operator and numbers" $ do
+                parseLispVal "(+ 1 2 3)"
+                    `shouldBe` pure (List 
+                        [Atom "+", Number 1, Number 2, Number 3])
+
+            it "List of operator and numbers 2" $ do
+                parseLispVal "(> 1 2)"
+                    `shouldBe` pure (List [Atom ">", Number 1, Number 2])
+                
+            it "List of operator and numbers 3" $ do
+                parseLispVal "(number? 1)"
+                    `shouldBe` pure (List [Atom "number?", Number 1])
+            
+            it "List of car and list" $ do
+                parseLispVal "(car (1 2 3))"
+                    `shouldBe` pure (List [Atom "car", 
+                        List [Number 1, Number 2, Number 3]])
 
         describe "Dotted List parsing" $ do
             it "Dotted list of Atoms" $ do
