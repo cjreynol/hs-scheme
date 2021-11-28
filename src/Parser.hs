@@ -13,7 +13,7 @@ module Parser (
 
 import Control.Applicative              ((<|>), many, optional)
 import Control.Applicative.Combinators  (between, endBy, sepBy)
-import Control.Monad.Except             (throwError)
+import Data.Bifunctor                   (first)
 import Data.Text                        (Text, pack, singleton, unpack)
 
 import Text.Megaparsec                  (Parsec, ParseErrorBundle, eof, noneOf, 
@@ -33,9 +33,10 @@ type Parser = Parsec Text Text
 type ParserError = ParseErrorBundle Text Text
 
 readExpr :: Text -> ThrowsException LispVal
-readExpr input = case parseLispVal input of
-    Right val -> pure val
-    Left err -> throwError $ ParsingError $ (pack . show) err
+readExpr input = first errorConversion $ parseLispVal input
+    where
+        errorConversion :: ParserError -> LispException
+        errorConversion err = ParsingError $ (pack . show) err
 
 parseLispVal :: Text -> Either ParserError LispVal
 parseLispVal = runParser (parseExpr <* eof) "expression"
@@ -50,9 +51,9 @@ parseExpr = parseReserved
 
 parseAtom :: Parser LispVal
 parseAtom = do
-    first <- letterChar <|> symbolChar
+    firstChar <- letterChar <|> symbolChar
     rest <- many (alphaNumChar <|> symbolChar)
-    pure $ Atom $ pack (first : rest)
+    pure $ Atom $ pack (firstChar : rest)
     where
         symbolChar :: Parser Char
         symbolChar = oneOf $ unpack "!#$%&|*+-/:<=>?@^_~"
@@ -62,9 +63,9 @@ parseList = List <$> sepBy parseExpr space1
 
 parseDottedList :: Parser LispVal
 parseDottedList = do
-    first <- endBy parseExpr space1
+    firstChar <- endBy parseExpr space1
     rest <- char '.' >> space1 >> parseExpr
-    pure $ DottedList first rest
+    pure $ DottedList firstChar rest
 
 parseQuoted :: Parser LispVal
 parseQuoted = do
@@ -117,13 +118,13 @@ parseReserved = try parseNil
         parseChar :: Parser LispVal
         parseChar = do
             _ <- char '\\'
-            first <- alphaNumChar
+            firstChar <- alphaNumChar
             rest <- many letterChar
-            case pack $ first : rest of
+            case pack $ firstChar : rest of
                 "newline" -> pure $ String "\n"
                 "space" -> pure $ String " "
                 _ -> case rest of 
-                    [] -> pure $ String $ singleton first
+                    [] -> pure $ String $ singleton firstChar
                     _ -> fail rest
 
 parseSigned :: Parser Integer -> Parser Integer
