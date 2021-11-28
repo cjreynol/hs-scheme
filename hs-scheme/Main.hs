@@ -15,6 +15,7 @@ import Data.Text.IO as T    (getLine, putStr, putStrLn)
 import System.Environment   (getArgs)
 import System.IO            (hFlush, stdout)
 
+import Context              (initialContext, runEvaluate)
 import Evaluation           (evaluate)
 import LispException        (showLispOutput)
 import Parser               (readExpr)
@@ -51,4 +52,5 @@ debugParse :: Text -> Text
 debugParse = showLispOutput . readExpr
 
 process :: Text -> Text
-process expr = showLispOutput $ readExpr expr >>= evaluate
+process expr = showLispOutput $ 
+    readExpr expr >>= runEvaluate evaluate initialContext 

@@ -12,12 +12,13 @@ module Evaluation (
 
 import Control.Monad.Except (throwError)
 
-import LispException        (LispException(BadSpecialForm), ThrowsException)
+import Context              (Eval)
+import LispException        (LispException(BadSpecialForm))
 import LispVal              (LispVal(Atom, Bool, List, Nil, Number, String))
 import Primitives           (apply)
 
 
-evaluate :: LispVal -> ThrowsException LispVal
+evaluate :: LispVal -> Eval LispVal
 evaluate val@(String _) = pure val
 evaluate val@(Bool _) = pure val
 evaluate val@(Number _) = pure val
