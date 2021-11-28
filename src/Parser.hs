@@ -82,6 +82,9 @@ parseString = String . pack <$> between (char '\"') (char '\"')
 parseDec :: Parser LispVal
 parseDec = Number <$> parseSigned decimal
 
+parseSigned :: Parser Integer -> Parser Integer
+parseSigned = signed $ pure ()
+
 parseReserved :: Parser LispVal
 parseReserved = try parseNil 
     <|> (char '#' >> parseBool
@@ -126,6 +129,3 @@ parseReserved = try parseNil
                 _ -> case rest of 
                     [] -> pure $ String $ singleton firstChar
                     _ -> fail rest
-
-parseSigned :: Parser Integer -> Parser Integer
-parseSigned = signed $ pure ()

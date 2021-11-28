@@ -32,7 +32,7 @@ type ThrowsException = Either LispException
 
 toExceptionMessage :: LispException -> Text
 toExceptionMessage (NumArgs n args) = 
-    "Expected - " <> (pack . show) n <> "args.  "
+    "Expected - " <> (pack . show) n <> " args.  "
     <> "Found - " <> T.unwords (map toSchemeString args)
 toExceptionMessage (TypeMismatch expected found) = 
     "Invalid type:  expected - " <> expected 
