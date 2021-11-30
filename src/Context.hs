@@ -9,7 +9,7 @@ License     : MIT
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Context (
-      Eval
+      Eval(Eval)
     , initialContext
     , runEvaluate
     , unEval

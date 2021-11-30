@@ -10,12 +10,14 @@ module Evaluation (
       evaluate
     ) where
 
-import Control.Monad.Except (throwError)
+import Control.Monad.Except       (throwError)
+import Control.Monad.Trans.Class  (lift)
 
-import Context              (Eval)
-import LispException        (LispException(BadSpecialForm))
-import LispVal              (LispVal(Atom, Bool, List, Nil, Number, String))
-import Primitives           (apply)
+import Context                    (Eval(Eval))
+import LispException              (LispException(BadSpecialForm))
+import LispVal                    (LispVal(Atom, Bool, List, Nil, Number, 
+                                  String))
+import Primitives                 (apply)
 
 
 evaluate :: LispVal -> Eval LispVal
@@ -33,6 +35,8 @@ evaluate (List [Atom "if", predicate, conseq, alt]) = do
         BadSpecialForm "if predicate must evaluate to boolean" predicate
 evaluate badForm@(List [Atom "if", _]) = throwError $ 
     BadSpecialForm "if <bool> <s-expr> <s-expr>" badForm
-evaluate (List (Atom func : args)) = traverse evaluate args >>= apply func
+evaluate (List (Atom func : args)) = do
+    args' <- traverse evaluate args 
+    Eval $ lift $ apply func args'
 evaluate badForm = throwError $ 
     BadSpecialForm "Unrecognized special form" badForm
