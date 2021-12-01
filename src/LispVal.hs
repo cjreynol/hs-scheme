@@ -10,6 +10,7 @@ module LispVal (
       LispVal(..)
     , getBoolean
     , getNumber
+    , getListPairs
     , isBoolean
     , isNull
     , isNumber
@@ -52,6 +53,10 @@ getBoolean _ = Nothing
 getNumber :: LispVal -> Maybe Integer
 getNumber (Number n) = Just n
 getNumber _ = Nothing
+
+getListPairs :: LispVal -> Maybe (Text, LispVal)
+getListPairs (List [Atom val, other]) = Just (val, other)
+getListPairs _ = Nothing
 
 isBoolean :: LispVal -> Bool
 isBoolean (Bool _) = True

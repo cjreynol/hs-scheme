@@ -23,7 +23,7 @@ data LispException =
     | ParsingError Text
     | BadSpecialForm Text LispVal
     | NotFunction Text Text
-    | UnboundVar Text Text
+    | UnboundVar Text
     | Default Text
     deriving (Eq, Show)
 
@@ -41,7 +41,8 @@ toExceptionMessage (ParsingError errorMessage) = "Parse error: " <> errorMessage
 toExceptionMessage (BadSpecialForm message form) = 
     message <> " - " <> toSchemeString form
 toExceptionMessage (NotFunction message func) = message <> " - " <> func
-toExceptionMessage (UnboundVar message varName) = message <> " - " <> varName
+toExceptionMessage (UnboundVar varName) = 
+    "Variable not found in context - " <> varName
 toExceptionMessage (Default message) = message
 
 showLispOutput :: ThrowsException LispVal -> Text

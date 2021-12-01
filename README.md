@@ -24,6 +24,7 @@ be backwards compatible beyond the bounds listed in the .cabal file.
 
 ## Next steps
 
-- Remaining language functionality to support lambdas/defines/local evaluation context.
+- Add set!/define functionality.
+- Add lambda and begin functionality.
 - File I/O with Ports.
 - Run scheme standard library scheme code and test that they are working as expected.
