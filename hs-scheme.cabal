@@ -3,7 +3,7 @@ name:                   hs-scheme
 version:                0.1.0.0
 license:                MIT
 license-file:           LICENSE
-copyright:              (c) 2020,2021 Chad Reynolds
+copyright:              (c) 2020-2023 Chad Reynolds
 author:                 Chad Reynolds
 maintainer:             cjreynol13@aol.com
 stability:              alpha
@@ -12,7 +12,7 @@ bug-reports:            https://github.com/cjreynol/hs-scheme/issues
 synopsis:               Implementation of "Write Yourself a Scheme in 48 Hours"
 description:            Based on the book here:  https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours
 category:               Language
-tested-with:            GHC == 8.10.7
+tested-with:            GHC == 9.2.7
 -- data-files:
 extra-source-files:     README.md
 
@@ -22,14 +22,14 @@ source-repository head
 
 executable hs-scheme
     main-is:            Main.hs
-    build-depends:        base          ^>= 4.14.0
-                        , text          ^>= 1.2.4
+    build-depends:        base          ^>= 4.16.4
+                        , text          ^>= 2.0.2
                         , hs-scheme-lib
     -- other-modules:
     hs-source-dirs:     hs-scheme
     default-extensions: OverloadedStrings
     -- other-extensions:   
-    default-language:   Haskell2010
+    default-language:   GHC2021
     ghc-options:        -Wall 
                         -Wcompat 
                         -Wincomplete-uni-patterns 
@@ -37,13 +37,13 @@ executable hs-scheme
                         -Wmissing-import-lists
 
 library hs-scheme-lib
-    build-depends:        base                  ^>= 4.14.0
-                        , containers            ^>= 0.6.5
-                        , megaparsec            ^>= 9.2.0
-                        , mtl                   ^>= 2.2.2
-                        , parser-combinators    ^>= 1.3
-                        , text                  ^>= 1.2.4
-                        , transformers          ^>= 0.5.6
+    build-depends:        base                  ^>= 4.16.4
+                        , containers            ^>= 0.6.7
+                        , megaparsec            ^>= 9.3.0
+                        , mtl                   ^>= 2.3.1
+                        , parser-combinators    ^>= 1.3.0
+                        , text                  ^>= 2.0.2
+                        , transformers          ^>= 0.6.1
     exposed-modules:      Context
                         , Evaluation
                         , LispException
@@ -54,7 +54,7 @@ library hs-scheme-lib
     hs-source-dirs:     src
     default-extensions: OverloadedStrings
     -- other-extensions:   
-    default-language:   Haskell2010
+    default-language:   GHC2021
     ghc-options:        -Wall 
                         -Wcompat 
                         -Wincomplete-uni-patterns 
@@ -64,17 +64,17 @@ library hs-scheme-lib
 test-suite spec
     type:               exitcode-stdio-1.0
     main-is:            Spec.hs
-    build-depends:        base          ^>= 4.14.0
-                        , hspec         >=  2.9.2
+    build-depends:        base          ^>= 4.16.4
+                        , hspec         >=  2.11.0
                         , hs-scheme-lib
-                        , mtl           ^>= 2.2.2
-                        , text          ^>= 1.2.4
+                        , mtl           ^>= 2.3.1
+                        , text          ^>= 2.0.2
     other-modules:        EvaluationSpec
                         , ParserSpec
                         , PrimitivesSpec
     hs-source-dirs:     test
     default-extensions: OverloadedStrings
     -- other-extensions:   
-    default-language:   Haskell2010
+    default-language:   GHC2021
     ghc-options:        -Wall
     build-tool-depends: hspec-discover:hspec-discover == 2.*
